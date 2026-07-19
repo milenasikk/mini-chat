@@ -1,130 +1,492 @@
 const jsTopics = {
-    "variables": `Variables are named containers used to store data. In JavaScript, we have three keywords to declare them:
+    "javascript-intro": `### 1. JavaScript: What is it?
+JavaScript (JS) is a lightweight, interpreted programming language created by **Brendan Eich** in **1995** in just 10 days while working at Netscape. Originally designed to make static web pages alive, it has evolved into a powerhouse running both on the client side (browsers) and server side (Node.js).
 
-1. let - The modern standard. The variable's value can be reassigned later.
-2. const - Short for constant. Its value cannot be changed once assigned.
-3. var - The legacy standard. It has quirky scoping rules, so avoid using it.
+* **Purpose:** To add interactivity, handle data, and build full-scale applications.
+* **Core Rule:** Easy to start, runs everywhere without setups.
 
 Code Example:
-let score = 100;
-score = 150; // OK!
+console.log("Hello, World!");`,
 
-const pi = 3.14;
-pi = 5; // Error! Cannot reassign a constant.`,
+    "html-integration": `### 2. How JS Works with HTML
+JavaScript connects to HTML using the <script> tag. The browser reads the HTML document line by line, runs the script, and manipulates the document structure (DOM).
 
-    "conditions": `Conditions allow your code to make decisions using if, else if, and else statements based on true or false values.
+Code Example:
+<!-- index.html -->
+<h1 id="title">Old Title</h1>
+<script>
+    const el = document.getElementById("title");
+    el.innerText = "Hello from JavaScript!";
+</script>`,
 
-Example:
-const points = 85;
+    "browser-console": `### 3. Browser Console
+The browser console is a developer's playground built directly inside modern browsers (accessible via F12 -> Console). It allows you to run JS lines live, inspect variables, debug logic errors, and read system outputs.
 
-if (points >= 90) {
-    console.log("Rank: A");
-} else if (points >= 75) {
-    console.log("Rank: B"); // Runs this block!
+Code Example:
+console.log("Standard output message");
+console.warn("This is a yellow warning alert");
+console.error("This is a red error block");`,
+
+    "let-const": `### 4. Variables: let & const
+Variables are storage containers for data values. Modern JS completely avoids the legacy 'var' keyword.
+
+* **let:** Reassignable variable. Block-scoped.
+* **const:** Immutable constant reference. Cannot be reassigned.
+
+Code Example:
+let userScore = 100;
+userScore = 120; // Perfect, it's reassignable!
+
+const birthYear = 2010;
+// birthYear = 2011; // Throws a TypeError!`,
+
+    "data-types": `### 5. Primitive Data Types
+JavaScript variables can hold multiple native data types automatically (Dynamic typing).
+
+* **Number:** Integers and floats.
+* **String:** Text characters wrapped in quotes.
+* **Boolean:** true or false values.
+* **Undefined:** Variable declared without a value assignment.
+* **Null:** Explicitly empty or intentional absence of any value.
+* **Symbol & BigInt:** Special unique wrappers and huge numbers.
+
+Code Example:
+let count = 42;
+let userName = "lil mill";
+let isOnline = true;
+let blankData; // value is undefined
+let emptySpace = null;`,
+
+    "interpolation": `### 6. Template Literals & Interpolation
+Interpolation allows you to embed expressions, calculations, and variables inside text blocks without cumbersome string addition operations (+). Uses backticks (\`) and \${expression}.
+
+Code Example:
+const artist = "Billie Eilish";
+const songsCount = 3;
+
+const message = \`My favorite singer is \${artist}, I like \${songsCount} tracks.\`;
+console.log(message);`,
+
+    "math-operations": `### 7. Mathematical Operators & Math Object
+Standard operators match global arithmetic rules (+, -, *, /, %). The built-in Math object provides complex methods.
+
+* **Math.sqrt(x):** Square root.
+* **Math.sin(x) / Math.cos(x):** Trigonometric calculations.
+* **Math.pow(x, y):** Exponentiation.
+* **Math.round() / Math.floor() / Math.ceil():** Rounding utilities.
+
+Code Example:
+let sum = 10 + 5;
+let root = Math.sqrt(16); // 4
+let power = Math.pow(2, 3); // 8
+let absolute = Math.abs(-9); // 9`,
+
+    "logical-operators": `### 8. Logical Operators
+Used to chain evaluations or provide fallback values.
+
+* **&& (AND):** true only if ALL operands are true.
+* **|| (OR):** true if AT LEAST ONE operand is true.
+* **! (NOT):** Flips the boolean state.
+
+Code Example:
+let hasToken = true;
+let isAuthorized = false;
+
+if (hasToken && !isAuthorized) {
+    console.log("Check complete.");
+}`,
+
+    "ternary-nullish": `### 9. Conditional Operators (? and ??)
+Compact alternatives to multi-line conditional expressions.
+
+* **Ternary (?):** Short inline if/else statement: condition ? trueResult : falseResult.
+* **Nullish Coalescing (??):** Returns the right side ONLY if the left side is null or undefined.
+
+Code Example:
+let userAge = 16;
+let status = userAge >= 18 ? "Adult" : "Minor"; // Minor
+
+let inputName = null;
+let profileName = inputName ?? "Guest User"; // Guest User`,
+
+    "if-else": `### 10. Conditional Branches (if / else / else if)
+Directs the structural flow of execution paths matching specific conditional statements.
+
+Code Example:
+let appRating = 4.5;
+
+if (appRating >= 4.8) {
+    console.log("Masterpiece");
+} else if (appRating >= 4.0) {
+    console.log("Great Application"); // Triggers this route!
 } else {
-    console.log("Try again!");
+    console.log("Needs updates");
 }`,
 
-    "functions": `Functions are reusable blocks of code designed to perform a specific task when called.
+    "loops-all": `### 11. Loops (for, while, do while, for...in, for...of)
+Loops repeat blocks until a state changes.
 
-Common way to write functions in JS:
-function sayHi(name) {
-    return "Hello, " + name + "!";
-}
+* **for:** Standard loop with a counter index.
+* **while:** Runs as long as the check statement stays true.
+* **do while:** Always runs at least once before the check.
+* **for...in:** Steps through enumerable keys of an object.
+* **for...of:** Steps directly through iterable items (like arrays).
 
-Calling a function:
-const greeting = sayHi("Alex");
-console.log(greeting); // Output: Hello, Alex!`,
+Code Example:
+for (let i = 0; i < 3; i++) console.log(i);
 
-    "arrow-functions": `Arrow Functions provide a concise and modern shorthand syntax for writing function expressions in JS.
+const items = ['a', 'b'];
+for (const item of items) console.log(item);`,
 
-Classic syntax:
-const double = function(x) {
-    return x * 2;
-};
+    "break-continue": `### 12. Loop Control (break and continue)
+Alters the regular flow of active loop blocks.
 
-Modern Arrow syntax:
-const double = (x) => x * 2;
+* **break:** Instantly terminates the loop and jumps out.
+* **continue:** Skips the rest of the current iteration and jumps to the next one.
 
-If there is only one parameter, you can drop the parentheses:
-const square = x => x * x;`,
-
-    "loops": `Loops allow you to repeat a block of code multiple times.
-
-Most popular loops in JS:
-
-1. 'for' loop (used when you know how many times to repeat):
-for (let i = 0; i < 5; i++) {
-    console.log("Step #" + i);
-}
-
-2. 'while' loop (runs as long as the condition is true):
-let count = 0;
-while (count < 3) {
-    console.log(count);
-    count++;
+Code Example:
+for (let num = 1; num <= 5; num++) {
+    if (num === 3) continue; // skips printing 3
+    if (num === 5) break;    // stops loop completely
+    console.log(num); // 1, 2, 4
 }`,
 
-    "arrays": `Arrays are ordered lists of values. They can hold multiple items of any data type. Array indexing always starts at zero (0).
+    "nested-loops": `### 13. Nested Loops
+A loop running entirely inside another loop. Used for handling grids, matrices, or multi-dimensional operations.
 
-Example:
-const fruits = ["Apple", "Banana", "Orange"];
-console.log(fruits[0]); // Output: Apple
-console.log(fruits.length); // Output: 3`,
-
-    "array-methods": `Array Methods allow you to easily manipulate data collections.
-
-Popular modern methods:
-• push() / pop() - add/remove elements at the end.
-• shift() / unshift() - add/remove elements at the start.
-• map() - creates a new array by transforming every element.
-• filter() - creates a new array with elements that pass a test condition.
-
-Example:
-const numbers = [1, 2, 3, 4];
-const evens = numbers.filter(n => n % 2 === 0); // [2, 4]`,
-
-    "objects": `Objects are collections of key-value pairs. They are perfect for describing real-world entities.
-
-Example:
-const user = {
-    name: "Alex",
-    age: 21,
-    isCoding: true
-};
-
-How to read values:
-console.log(user.name); // Output: Alex
-console.log(user["age"]); // Output: 21`,
-
-    "dom": `The DOM (Document Object Model) is a programming interface that lets JS interact with HTML structures to update content, styles, and handle events.
-
-Common operations:
-• document.getElementById() - selects an element by ID.
-• document.querySelector() - selects an element by CSS selector.
-• element.addEventListener() - listens for events like 'click'.
-
-Example:
-const btn = document.querySelector('.send-btn');
-btn.addEventListener('click', () => {
-    alert('Clicked!');
-});`,
-
-    "async": `Asynchronous JavaScript allows you to execute long-running tasks (like fetching data from an API) without freezing the entire interface.
-
-1. Promises: Represent an operation that will complete in the future.
-2. Async/Await: The modern, clean way to handle promises.
-
-Example:
-async function fetchData() {
-    try {
-        const response = await fetch('https://api.example.com/data');
-        const data = await response.json();
-        console.log(data);
-    } catch (error) {
-        console.error("Oops!", error);
+Code Example:
+for (let row = 1; row <= 2; row++) {
+    for (let col = 1; col <= 3; col++) {
+        console.log(\`Row \${row}, Col \${col}\`);
     }
-}`
+}`,
+
+    "arrays-creation": `### 14. Array Standard & Structural Initialization
+Arrays house collections of items ordered by positional indexes starting at 0.
+
+* **Literal notation:** Cleanest standard initialization.
+* **new Array():** Constructor instantiation pattern.
+* **Array.from():** Creates real arrays from array-like or iterable sets.
+
+Code Example:
+let base = [10, 20];
+let constructed = new Array(5); // array with 5 empty items
+let parsed = Array.from("JS"); // ['J', 'S']`,
+
+    "spread-operator": `### 15. The Spread Operator (...)
+Unpacks individual elements out of an array or properties out of an object. Excellent for duplication and combinations.
+
+Code Example:
+const source = [1, 2];
+const combined = [...source, 3, 4]; // [1, 2, 3, 4]
+
+const user = { name: "Mill" };
+const cloned = { ...user, active: true };`,
+
+    "array-methods": `### 16. Structural Array Manipulation Methods
+Methods that make managing list arrays extremely straightforward.
+
+* **push/pop/shift/unshift:** Modify items at boundaries.
+* **map/filter/reduce:** Core utilities for data mutations.
+* **find/findIndex/includes/indexOf:** Location utilities.
+* **slice/splice:** Copy parts or surgically mutate arrays.
+* **forEach/every/some/flat/sort/reverse/concat/join:** Utility actions.
+
+Code Example:
+let numbers = [1, 2, 3, 4];
+let filtered = numbers.filter(n => n > 2); // [3, 4]
+let multiplied = numbers.map(n => n * 2); // [2, 4, 6, 8]`,
+
+    "string-methods": `### 17. String Manipulation Methods
+Text operations are built directly into standard JavaScript string types.
+
+* **Case conversion:** toLowerCase(), toUpperCase()
+* **Extraction:** slice(), substring(), split()
+* **Trimming:** trim(), trimStart(), trimEnd()
+* **Checks:** includes(), startsWith(), endsWith(), indexOf()
+* **Formatting:** replace(), replaceAll(), padStart(), padEnd()
+
+Code Example:
+let raw = "   Electron App   ";
+let cleaned = raw.trim().toLowerCase(); // "electron app"
+let parts = cleaned.split(" "); // ["electron", "app"]`,
+
+    "regex-methods": `### 18. Regular Expressions (RegExp)
+Pattern matching tools used to validate data strings or find/replace values.
+
+* **Patterns:** \\d (digits), \\D (non-digits), \\w (word alphanumeric), \\s (whitespace), . (any character).
+* **Methods:** test() (boolean check), exec(), match(), replace(), search(), split().
+* **Groups & Assertions:** Parentheses () create matching groups.
+
+Code Example:
+let pattern = /\\d{3}/; // checks for 3 digits in a row
+let check = pattern.test("ABC-123"); // true
+let text = "I love JS".replace(/JS/, "JavaScript");`,
+
+    "functions-basics": `### 19. Function Foundations & Closures
+Functions encapsulate logic scopes.
+
+* **Anonymous Functions:** Functions without names, typically assigned to variables or passed as parameters.
+* **Default values:** Parameters that initialize with fallbacks if left undefined.
+* **Closures:** A function's superpower to remember and access variables from its outer lexicon scope even after the outer function has finished execution.
+
+Code Example:
+function makeCounter() {
+    let count = 0;
+    return function() {
+        count++;
+        return count; // closure holds access to 'count'
+    };
+}
+const counter = makeCounter();
+console.log(counter()); // 1`,
+
+    "arrow-functions": `### 20. Arrow Functions Shorthand
+Clean, compact syntax for code declarations.
+
+* **Lexical 'this':** Arrow functions do not declare their own execution context ('this'). They adopt 'this' directly from their parent scope context.
+
+Code Example:
+const add = (a, b) => a + b;
+const greeting = () => console.log("Hi!");`,
+
+    "advanced-functions": `### 21. IIFE & Recursive Operations
+* **IIFE (Immediately Invoked Function Expression):** A function that executes instantly as soon as it is defined, preventing global namespace pollution.
+* **Recursion:** A design pattern where a function runs internal loops by continuously calling itself until it hits a base exit condition.
+
+Code Example:
+(function() {
+    console.log("IIFE executed!");
+})();
+
+function factorial(n) {
+    if (n <= 1) return 1; // base exit condition
+    return n * factorial(n - 1); // recursive execution
+}`,
+
+    "hoisting": `### 22. Variable & Function Hoisting
+Hoisting is a behavior in JavaScript where variable and function declarations are mentally lifted to the top of their compilation scopes before execution.
+
+* **Function declarations:** Completely hoisted; you can invoke them before they appear in the source.
+* **let & const:** Hoisted but kept in a "Temporal Dead Zone" (TDZ). Calling them early throws a ReferenceError.
+
+Code Example:
+sayHi(); // Works perfectly!
+function sayHi() { console.log("Hi!"); }`,
+
+    "oop-classes": `### 23. OOP Foundations & Classes
+Classes act as blueprints for generating programmatic data objects with properties and behaviors.
+
+Code Example:
+class AppController {
+    constructor(appName) {
+        this.name = appName;
+    }
+    launch() {
+        console.log(\`\${this.name} started.\`);
+    }
+}
+const myApp = new AppController("Pixel Notes");
+myApp.launch();`,
+
+    "private-methods": `### 24. Private Fields & Methods
+Prepending a hash symbol (#) to variables or helper methods completely hides them from external access outside the enclosing class shell.
+
+Code Example:
+class SafeStorage {
+    #encryptionKey = "SECRET123";
+
+    #validate() {
+        return true;
+    }
+    readData() {
+        if (this.#validate()) return "Decrypted data string";
+    }
+}`,
+
+    "getters-setters": `### 25. Getters & Setters (Accessors)
+Getters and setters look like standard properties from the outside, but they run internal tracking functions under the hood to intercept reads or validate updates.
+
+Code Example:
+class User {
+    constructor(name) { this._name = name; }
+    get name() { return this._name.toUpperCase(); }
+    set name(val) {
+        if (val.length > 0) this._name = val;
+    }
+}`,
+
+    "static-members": `### 26. Static Fields & Static Private Members
+Static properties and methods attach directly to the main class constructor definition itself, rather than being copied onto instance instances created with the 'new' keyword.
+
+Code Example:
+class MathUtils {
+    static #pi = 3.14159; // static private variable
+    static calculateArea(radius) {
+        return this.#pi * radius * radius;
+    }
+}
+console.log(MathUtils.calculateArea(5));`,
+
+    "mvc-pattern": `### 27. Model-View-Controller (MVC) in Classes
+A clean structural software design pattern splitting duties into distinct segments:
+
+* **Model:** Handles raw application data storage and logic states.
+* **View:** Manages DOM interface elements, layouts, and display rendering.
+* **Controller:** Intercepts system events and acts as a bridge between Model and View updates.
+
+Code Example:
+class Model { constructor() { this.data = []; } }
+class View { render(data) { /* updates screen layout */ } }
+class Controller {
+    constructor(m, v) { this.m = m; this.v = v; }
+}`,
+
+    "error-handling": `### 28. Robust Error Interception (try / catch / finally)
+Gracefully handles crashes without freezing execution pipelines.
+
+* **try:** Isolates risky execution code blocks.
+* **catch:** Captures generated exception payloads (ReferenceError, TypeError, SyntaxError).
+* **finally:** A cleanup block guaranteed to run regardless of whether an error occurred.
+
+Code Example:
+try {
+    dangerousCode();
+} catch (err) {
+    console.error("Intercepted: " + err.name);
+} finally {
+    console.log("Cleanup operation absolute execution.");
+}`,
+
+    "advanced-oop": `### 29. Advanced Object Mutation & Deletion
+* **Primitive Box wrappers:** JS converts plain strings temporary into wrapper objects automatically behind the scenes to let you call properties like '.length'.
+* **delete operator:** Removes key-value attributes completely from active dynamic objects.
+
+Code Example:
+let item = { status: "active", id: 101 };
+delete item.status; 
+console.log(item); // { id: 101 }`,
+
+    "context-this": `### 30. Execution Context ('this') & System Architecture
+* **this:** References the object currently executing the function context.
+* **Arrow functions:** Inherit 'this' lexically from their surrounding block rather than setting a unique dynamic execution context.
+* **globalThis:** Unified access token targeting global scopes uniformly across browsers or Node environments.
+* **Object.fromEntries():** Converts an array of key-value pairs into a standard object.
+
+Code Example:
+const pairs = [['a', 1], ['b', 2]];
+const obj = Object.fromEntries(pairs); // {a: 1, b: 2}`,
+
+    "object-cloning": `### 31. Object Reference Cloning & Composition
+Objects store memory address reference references rather than literal raw value duplicates.
+
+* **Shallow Copying:** Use spread operators ({...}) or Object.assign() to clone top-level attributes.
+* **Deep Copying:** Use structuredClone() to deeply replicate nested object structures across distinct addresses.
+
+Code Example:
+let original = { x: 1, nested: { y: 2 } };
+let shallow = { ...original };
+let deep = structuredClone(original);`,
+
+    "object-comparison": `### 32. Object Reference Comparison
+Comparing separate object instances via (===) checks whether they share the exact same reference memory address, not if their properties look identical.
+
+Code Example:
+let first = { val: 5 };
+let second = { val: 5 };
+console.log(first === second); // false (separate memory addresses)
+
+let link = first;
+console.log(first === link); // true (points to the exact same reference location)`,
+
+    "object-iterations": `### 33. Object Exploration Utilities
+Global methods used to convert object internal layouts into standard iterable arrays.
+
+* **Object.keys():** Returns an array of keys.
+* **Object.values():** Returns an array of property values.
+* **Object.entries():** Returns an array of nested key-value pairs ([key, value]).
+
+Code Example:
+const app = { title: "App", size: 800 };
+console.log(Object.keys(app)); // ["title", "size"]
+console.log(Object.values(app)); // ["App", 800]`,
+
+    "objects-in-functions": `### 34. Objects in Functions & Destructuring Parameters
+Passing objects into function parameters allows you to clean up signatures using destructuring targets directly within the argument definitions.
+
+Code Example:
+function loadWindow({ width, height, fullscreen = false }) {
+    console.log(\`Size: \${width}x\${height}. Fullscreen state: \${fullscreen}\`);
+}
+const config = { width: 800, height: 600 };
+loadWindow(config);`,
+
+    "factory-constructors": `### 35. Factory Functions & Constructor Instantiation
+Alternative ways to spin up custom objects.
+
+* **Constructor Function:** Legacy pattern running with the 'new' keyword to automatically bind instances to 'this'.
+
+Code Example:
+function SoundTrack(title) {
+    this.title = title;
+    this.play = function() { console.log("Playing " + this.title); };
+}
+const song = new SoundTrack("Birds of a Feather");`,
+
+    "instanceof-operator": `### 36. Type Checking with instanceof
+Verifies whether a specific target object inherits characteristics or belongs to a designated class or parent constructor hierarchy.
+
+Code Example:
+class Panel {}
+const mainPanel = new Panel();
+
+console.log(mainPanel instanceof Panel); // true
+console.log(mainPanel instanceof Array); // false`,
+
+    "prototypes": `### 37. JavaScript Prototype Architecture
+Prototypes are the hidden engine mechanics behind JavaScript inheritance. Objects look up missing properties down a prototype chain link until they hit null.
+
+Code Example:
+const animal = { eats: true };
+const rabbit = Object.create(animal);
+
+console.log(rabbit.eats); // true (inherited via the prototype chain)`,
+
+    "constructor-prototype": `### 38. Constructor Prototype Mechanics
+Every constructor function shares a '.prototype' property object container. All instances generated via that constructor share access to methods declared inside that prototype pool.
+
+Code Example:
+function Device(name) { this.name = name; }
+Device.prototype.turnOn = function() { console.log(this.name + " online."); };
+
+const laptop = new Device("Laptop");
+laptop.turnOn();`,
+
+    "call-apply-bind": `### 39. Function Context Control: call, apply & bind
+Explicitly forces or locks dynamic 'this' contexts onto designated targeted methods.
+
+* **call():** Invokes functions instantly while accepting arguments separated by commas.
+* **apply():** Invokes functions instantly while accepting arguments wrapped in a clean array.
+* **bind():** Creates a clone function with a locked 'this' context ready for future execution.
+
+Code Example:
+function describe(tag) { console.log(\`\${tag}: \${this.name}\`); }
+const contextObj = { name: "Pixel Application" };
+
+describe.call(contextObj, "App Log");`,
+
+    "property-descriptors": `### 40. Meta Property Architecture & Configuration Control
+* **Object.create():** Generates clean objects while customizing chosen prototype baselines.
+* **Property Descriptors:** Customizes security layers via internal flag descriptors (writable, enumerable, configurable).
+
+Code Example:
+const strictObj = {};
+Object.defineProperty(strictObj, 'id', {
+    value: 999,
+    writable: false,      // read-only property value lock
+    enumerable: true,     // shows up in loops
+    configurable: false   // cannot be deleted or reconfigured
+});`
 };
 
 // DOM Elements
