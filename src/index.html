@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+    <title>Mini Chat</title>
+    <link rel="icon" type="image/x-icon" href="assets/icon.ico">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+    <div class="sidebar">
+        <p class="sidebar-title">Menu</p>
+        <ul class="sidebar-menu">
+            <li><a href="#" class="active">Chat</a></li>
+            <li><a href="#">History</a></li>
+            <li><a href="#">Settings</a></li>
+        </ul>
+    </div>
+
+    <div class="home">
+        <p class="title">Mini Chat</p>
+
+        <div class="chat-container" id="chat-container">
+            <div class="message bot-message">
+                Hi there! I am your pixelated JS helper. Ask me about any JS topic (for example: "variables", "loops", "functions", "arrays", "objects"), and I will explain it in detail!
+            </div>
+        </div>
+
+        <div class="input-container">
+            <input type="text" class="text-input" id="user-input" placeholder="Enter your question...">
+            <button class="send-btn" id="send-btn">➔</button>
+        </div>
+
+        <div class="icon">
+            <img src="assets/chat.png" class="logo">
+        </div>
+
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
