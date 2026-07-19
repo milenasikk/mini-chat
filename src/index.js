@@ -9,14 +9,16 @@ const createWindow = () => {
   Menu.setApplicationMenu(null);
 
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 950,
+    height: 700,
+    minWidth: 800,
+    minHeight: 600,
     icon: path.join(__dirname, 'assets/icon.ico'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
     frame: true,
-    resizable: false,
+    resizable: true,
   });
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));

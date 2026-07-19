@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
+    <div class="bg-overlay"></div>
 
     <div class="sidebar">
         <p class="sidebar-title">Menu</p>
@@ -26,7 +27,19 @@
 
         <div class="chat-container" id="chat-container">
             <div class="message bot-message">
-                Hi there! I am your pixelated JS helper. Ask me about any JS topic (for example: "variables", "loops", "functions", "arrays", "objects"), and I will explain it in detail!
+                <p style="margin: 0 0 10px 0;">Hi there! I am your pixelated JS helper. Ask me about any JS topic (for example: "variables", "loops", "functions", "arrays", "objects"), and I will explain it in detail!</p>
+                <div class="chips-container">
+                    <button class="topic-chip" data-topic="variables"># variables</button>
+                    <button class="topic-chip" data-topic="conditions"># conditions</button>
+                    <button class="topic-chip" data-topic="functions"># functions</button>
+                    <button class="topic-chip" data-topic="arrow-functions"># arrow-fns</button>
+                    <button class="topic-chip" data-topic="loops"># loops</button>
+                    <button class="topic-chip" data-topic="arrays"># arrays</button>
+                    <button class="topic-chip" data-topic="array-methods"># array-methods</button>
+                    <button class="topic-chip" data-topic="objects"># objects</button>
+                    <button class="topic-chip" data-topic="dom"># dom-api</button>
+                    <button class="topic-chip" data-topic="async"># async-js</button>
+                </div>
             </div>
         </div>
 
