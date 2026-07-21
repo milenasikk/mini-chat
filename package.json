@@ -12,6 +12,21 @@
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\""
   },
+ "config": {
+    "forge": {
+      "packagerConfig": {
+        "icon": "./src/assets/icon"
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "setupIcon": "./src/assets/icon.ico"
+          }
+        }
+      ]
+    }
+  },
   "keywords": [],
   "author": {
     "name": "milenasikk",
