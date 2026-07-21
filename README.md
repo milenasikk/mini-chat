@@ -8,7 +8,7 @@
 * 🖥️ Fixed, adaptive interface tailored perfectly for an **800×600 px** window size.
 * 🎨 Unique visual style inspired by Pixel Art[cite: 1, 2].
 * ⌨️ Interactive chat with smooth message appearance animations and a simulated "typing" response effect.
-* 📚 Built-in support for breakdown topics: `variables`, `functions`, `loops`, `objects`, and `arrays`.
+* 📚 Built-in support for breakdown topics: `variables`, `functions`, `loops`, `objects` and so on.
 
 ---
 
