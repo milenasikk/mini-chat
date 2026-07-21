@@ -1,6 +1,6 @@
 {
   "name": "mini-chat",
-  "productName": "mini-chat",
+  "productName": "Mini Chat",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": "src/index.js",
