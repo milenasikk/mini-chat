@@ -35,10 +35,9 @@ Variables are storage containers for data values. Modern JS completely avoids th
 
 Code Example:
 let userScore = 100;
-userScore = 120; // Perfect, it's reassignable!
+userScore = 120;
 
-const birthYear = 2010;
-// birthYear = 2011; // Throws a TypeError!`,
+const birthYear = 2010;`,
 
     "data-types": `### 5. Primitive Data Types
 JavaScript variables can hold multiple native data types automatically (Dynamic typing).
@@ -54,7 +53,7 @@ Code Example:
 let count = 42;
 let userName = "lil mill";
 let isOnline = true;
-let blankData; // value is undefined
+let blankData;
 let emptySpace = null;`,
 
     "interpolation": `### 6. Template Literals & Interpolation
@@ -77,9 +76,9 @@ Standard operators match global arithmetic rules (+, -, *, /, %). The built-in M
 
 Code Example:
 let sum = 10 + 5;
-let root = Math.sqrt(16); // 4
-let power = Math.pow(2, 3); // 8
-let absolute = Math.abs(-9); // 9`,
+let root = Math.sqrt(16);
+let power = Math.pow(2, 3);
+let absolute = Math.abs(-9);`,
 
     "logical-operators": `### 8. Logical Operators
 Used to chain evaluations or provide fallback values.
@@ -104,10 +103,10 @@ Compact alternatives to multi-line conditional expressions.
 
 Code Example:
 let userAge = 16;
-let status = userAge >= 18 ? "Adult" : "Minor"; // Minor
+let status = userAge >= 18 ? "Adult" : "Minor";
 
 let inputName = null;
-let profileName = inputName ?? "Guest User"; // Guest User`,
+let profileName = inputName ?? "Guest User";`,
 
     "if-else": `### 10. Conditional Branches (if / else / else if)
 Directs the structural flow of execution paths matching specific conditional statements.
@@ -118,7 +117,7 @@ let appRating = 4.5;
 if (appRating >= 4.8) {
     console.log("Masterpiece");
 } else if (appRating >= 4.0) {
-    console.log("Great Application"); // Triggers this route!
+    console.log("Great Application");
 } else {
     console.log("Needs updates");
 }`,
@@ -146,9 +145,9 @@ Alters the regular flow of active loop blocks.
 
 Code Example:
 for (let num = 1; num <= 5; num++) {
-    if (num === 3) continue; // skips printing 3
-    if (num === 5) break;    // stops loop completely
-    console.log(num); // 1, 2, 4
+    if (num === 3) continue;
+    if (num === 5) break;
+    console.log(num);
 }`,
 
     "nested-loops": `### 13. Nested Loops
@@ -170,15 +169,15 @@ Arrays house collections of items ordered by positional indexes starting at 0.
 
 Code Example:
 let base = [10, 20];
-let constructed = new Array(5); // array with 5 empty items
-let parsed = Array.from("JS"); // ['J', 'S']`,
+let constructed = new Array(5);
+let parsed = Array.from("JS");`,
 
     "spread-operator": `### 15. The Spread Operator (...)
 Unpacks individual elements out of an array or properties out of an object. Excellent for duplication and combinations.
 
 Code Example:
 const source = [1, 2];
-const combined = [...source, 3, 4]; // [1, 2, 3, 4]
+const combined = [...source, 3, 4];
 
 const user = { name: "Mill" };
 const cloned = { ...user, active: true };`,
@@ -194,8 +193,8 @@ Methods that make managing list arrays extremely straightforward.
 
 Code Example:
 let numbers = [1, 2, 3, 4];
-let filtered = numbers.filter(n => n > 2); // [3, 4]
-let multiplied = numbers.map(n => n * 2); // [2, 4, 6, 8]`,
+let filtered = numbers.filter(n => n > 2);
+let multiplied = numbers.map(n => n * 2);`,
 
     "string-methods": `### 17. String Manipulation Methods
 Text operations are built directly into standard JavaScript string types.
@@ -208,8 +207,8 @@ Text operations are built directly into standard JavaScript string types.
 
 Code Example:
 let raw = "   Electron App   ";
-let cleaned = raw.trim().toLowerCase(); // "electron app"
-let parts = cleaned.split(" "); // ["electron", "app"]`,
+let cleaned = raw.trim().toLowerCase();
+let parts = cleaned.split(" ");`,
 
     "regex-methods": `### 18. Regular Expressions (RegExp)
 Pattern matching tools used to validate data strings or find/replace values.
@@ -219,8 +218,8 @@ Pattern matching tools used to validate data strings or find/replace values.
 * **Groups & Assertions:** Parentheses () create matching groups.
 
 Code Example:
-let pattern = /\\d{3}/; // checks for 3 digits in a row
-let check = pattern.test("ABC-123"); // true
+let pattern = /\\d{3}/;
+let check = pattern.test("ABC-123");
 let text = "I love JS".replace(/JS/, "JavaScript");`,
 
     "functions-basics": `### 19. Function Foundations & Closures
@@ -235,11 +234,11 @@ function makeCounter() {
     let count = 0;
     return function() {
         count++;
-        return count; // closure holds access to 'count'
+        return count;
     };
 }
 const counter = makeCounter();
-console.log(counter()); // 1`,
+console.log(counter());`,
 
     "arrow-functions": `### 20. Arrow Functions Shorthand
 Clean, compact syntax for code declarations.
@@ -260,8 +259,8 @@ Code Example:
 })();
 
 function factorial(n) {
-    if (n <= 1) return 1; // base exit condition
-    return n * factorial(n - 1); // recursive execution
+    if (n <= 1) return 1;
+    return n * factorial(n - 1);
 }`,
 
     "hoisting": `### 22. Variable & Function Hoisting
@@ -271,7 +270,7 @@ Hoisting is a behavior in JavaScript where variable and function declarations ar
 * **let & const:** Hoisted but kept in a "Temporal Dead Zone" (TDZ). Calling them early throws a ReferenceError.
 
 Code Example:
-sayHi(); // Works perfectly!
+sayHi();
 function sayHi() { console.log("Hi!"); }`,
 
     "oop-classes": `### 23. OOP Foundations & Classes
@@ -321,7 +320,7 @@ Static properties and methods attach directly to the main class constructor defi
 
 Code Example:
 class MathUtils {
-    static #pi = 3.14159; // static private variable
+    static #pi = 3.14159;
     static calculateArea(radius) {
         return this.#pi * radius * radius;
     }
@@ -337,7 +336,7 @@ A clean structural software design pattern splitting duties into distinct segmen
 
 Code Example:
 class Model { constructor() { this.data = []; } }
-class View { render(data) { /* updates screen layout */ } }
+class View { render(data) { } }
 class Controller {
     constructor(m, v) { this.m = m; this.v = v; }
 }`,
@@ -365,7 +364,7 @@ try {
 Code Example:
 let item = { status: "active", id: 101 };
 delete item.status; 
-console.log(item); // { id: 101 }`,
+console.log(item);`,
 
     "context-this": `### 30. Execution Context ('this') & System Architecture
 * **this:** References the object currently executing the function context.
@@ -375,7 +374,7 @@ console.log(item); // { id: 101 }`,
 
 Code Example:
 const pairs = [['a', 1], ['b', 2]];
-const obj = Object.fromEntries(pairs); // {a: 1, b: 2}`,
+const obj = Object.fromEntries(pairs);`,
 
     "object-cloning": `### 31. Object Reference Cloning & Composition
 Objects store memory address reference references rather than literal raw value duplicates.
@@ -394,10 +393,10 @@ Comparing separate object instances via (===) checks whether they share the exac
 Code Example:
 let first = { val: 5 };
 let second = { val: 5 };
-console.log(first === second); // false (separate memory addresses)
+console.log(first === second);
 
 let link = first;
-console.log(first === link); // true (points to the exact same reference location)`,
+console.log(first === link);`,
 
     "object-iterations": `### 33. Object Exploration Utilities
 Global methods used to convert object internal layouts into standard iterable arrays.
@@ -408,8 +407,8 @@ Global methods used to convert object internal layouts into standard iterable ar
 
 Code Example:
 const app = { title: "App", size: 800 };
-console.log(Object.keys(app)); // ["title", "size"]
-console.log(Object.values(app)); // ["App", 800]`,
+console.log(Object.keys(app));
+console.log(Object.values(app));`,
 
     "objects-in-functions": `### 34. Objects in Functions & Destructuring Parameters
 Passing objects into function parameters allows you to clean up signatures using destructuring targets directly within the argument definitions.
@@ -440,8 +439,8 @@ Code Example:
 class Panel {}
 const mainPanel = new Panel();
 
-console.log(mainPanel instanceof Panel); // true
-console.log(mainPanel instanceof Array); // false`,
+console.log(mainPanel instanceof Panel);
+console.log(mainPanel instanceof Array);`,
 
     "prototypes": `### 37. JavaScript Prototype Architecture
 Prototypes are the hidden engine mechanics behind JavaScript inheritance. Objects look up missing properties down a prototype chain link until they hit null.
@@ -450,7 +449,7 @@ Code Example:
 const animal = { eats: true };
 const rabbit = Object.create(animal);
 
-console.log(rabbit.eats); // true (inherited via the prototype chain)`,
+console.log(rabbit.eats);`,
 
     "constructor-prototype": `### 38. Constructor Prototype Mechanics
 Every constructor function shares a '.prototype' property object container. All instances generated via that constructor share access to methods declared inside that prototype pool.
@@ -483,9 +482,9 @@ Code Example:
 const strictObj = {};
 Object.defineProperty(strictObj, 'id', {
     value: 999,
-    writable: false,      // read-only property value lock
-    enumerable: true,     // shows up in loops
-    configurable: false   // cannot be deleted or reconfigured
+    writable: false,
+    enumerable: true,
+    configurable: false
 });`
 };
 
@@ -539,18 +538,15 @@ Here are all available topics:
     <button class="topic-chip" data-topic="property-descriptors"># meta-properties</button>
 </div>`;
 
-// DOM Elements
 const chatContainer = document.getElementById('chat-container');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 
-// Event Listeners for click and Enter key
 sendBtn.addEventListener('click', handleSend);
 userInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !userInput.disabled) handleSend();
 });
 
-// Event Delegation for Topic Chips
 chatContainer.addEventListener('click', (e) => {
     if (e.target.classList.contains('topic-chip')) {
         if (userInput.disabled) return;
@@ -559,26 +555,21 @@ chatContainer.addEventListener('click', (e) => {
     }
 });
 
-// Отправка темы при клике на чип
 function sendTopic(topicName) {
     appendMessage(topicName, 'user-message');
     showTypingIndicator();
 }
 
-// Handling Send Action
 function handleSend() {
     const text = userInput.value.trim();
     if (text === '') return;
 
-    // Render user message
     appendMessage(text, 'user-message');
     userInput.value = '';
 
-    // Show typing indicator
     showTypingIndicator();
 }
 
-// Append messages to the chat container
 function appendMessage(text, className) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', className);
@@ -594,13 +585,11 @@ function appendMessage(text, className) {
     return messageDiv;
 }
 
-// Переключение состояния элементов интерфейса
 function setInterfaceDisabled(status) {
     userInput.disabled = status;
     sendBtn.disabled = status;
 }
 
-// Typing Indicator delay ("Thinking...")
 function showTypingIndicator() {
     setInterfaceDisabled(true);
     const tempMessage = appendMessage('Hmm, thinking...', 'bot-message');
@@ -611,33 +600,85 @@ function showTypingIndicator() {
     }, 1200);
 }
 
-// Search database and start typing response
 function generateBotResponse() {
     const userMessages = document.querySelectorAll('.user-message');
-    const lastUserText = userMessages[userMessages.length - 1].innerText.toLowerCase().trim();
+    
+    const lastUserText = userMessages[userMessages.length - 1].innerText
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .trim();
 
-    // Проверка на команду help
     if (lastUserText === 'help') {
         appendMessage(topicsChipsHTML, 'bot-message');
         setInterfaceDisabled(false);
         return;
     }
 
-    let reply = "Hmm, I don't know that topic yet. Try asking about: 'variables', 'functions', 'loops', 'objects', or type 'help' to see all topics.";
+    const topicKeywords = {
+        "javascript-intro": ["js", "javascript", "intro", "what is js"],
+        "html-integration": ["html", "script", "dom"],
+        "browser-console": ["console", "log", "debug"],
+        "let-const": ["let", "const", "var", "variable", "variables"],
+        "data-types": ["data type", "data types", "primitive", "string", "number", "boolean"],
+        "interpolation": ["interpolation", "template literal", "backtick"],
+        "math-operations": ["math", "calculator", "operator", "operators"],
+        "logical-operators": ["logical", "and", "or", "not"],
+        "ternary-nullish": ["ternary", "nullish"],
+        "if-else": ["if", "else", "condition", "conditional"],
+        "loops-all": ["loop", "loops", "for", "while"],
+        "break-continue": ["break", "continue"],
+        "nested-loops": ["nested loop", "nested loops"],
+        "arrays-creation": ["array", "arrays", "arrays-init"],
+        "spread-operator": ["spread", "spread operator"],
+        "array-methods": ["array method", "array methods", "map", "filter", "reduce", "push", "pop"],
+        "string-methods": ["string method", "string methods"],
+        "regex-methods": ["regex", "regexp", "regular expression"],
+        "functions-basics": ["function", "functions", "closure", "closures"],
+        "arrow-functions": ["arrow function", "arrow functions", "arrow"],
+        "advanced-functions": ["iife", "recursion"],
+        "hoisting": ["hoisting"],
+        "oop-classes": ["class", "classes", "oop", "object oriented"],
+        "private-methods": ["private", "private method", "private field"],
+        "getters-setters": ["getter", "getters", "setter", "setters"],
+        "static-members": ["static"],
+        "mvc-pattern": ["mvc", "model view controller"],
+        "error-handling": ["try", "catch", "try catch", "error"],
+        "advanced-oop": ["delete operator", "box wrappers"],
+        "context-this": ["this", "context", "globalthis"],
+        "object-cloning": ["clone", "cloning", "structuredclone", "shallow copy", "deep copy"],
+        "object-comparison": ["object compare", "object comparison"],
+        "object-iterations": ["object keys", "object values", "object entries"],
+        "objects-in-functions": ["destructuring", "object params"],
+        "factory-constructors": ["constructor", "constructors", "factory"],
+        "instanceof-operator": ["instanceof"],
+        "prototypes": ["prototype", "prototypes", "proto"],
+        "constructor-prototype": ["constructor prototype"],
+        "call-apply-bind": ["call", "apply", "bind"],
+        "property-descriptors": ["property descriptors", "defineproperty"]
+    };
 
-    // Matching key terms
-    for (const key in jsTopics) {
-        if (lastUserText.includes(key)) {
-            reply = jsTopics[key];
-            break;
+    let matchedTopicKey = null;
+
+    if (jsTopics[lastUserText]) {
+        matchedTopicKey = lastUserText;
+    } else {
+        for (const [topicKey, keywords] of Object.entries(topicKeywords)) {
+            const hasMatch = keywords.some(keyword => lastUserText.includes(keyword));
+            if (hasMatch) {
+                matchedTopicKey = topicKey;
+                break;
+            }
         }
     }
+
+    let reply = matchedTopicKey 
+        ? jsTopics[matchedTopicKey] 
+        : "Hmm, I don't know that topic yet. Try asking about: 'variables', 'functions', 'loops', 'objects', or type 'help' to see all topics.";
 
     const botMessageElement = appendMessage('', 'bot-message');
     typeText(botMessageElement, reply);
 }
 
-// Typewriter Effect
 function typeText(element, text) {
     let index = 0;
     const speed = 15;
