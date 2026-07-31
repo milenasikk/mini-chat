@@ -489,6 +489,56 @@ Object.defineProperty(strictObj, 'id', {
 });`
 };
 
+const topicsChipsHTML = `
+Here are all available topics:
+<div class="chips-container">
+    <div style="width: 100%; margin-top: 5px; font-weight: bold; font-size: 14px; text-transform: uppercase; color: var(--main-brown); opacity: 0.7;">— Beginner —</div>
+    <button class="topic-chip" data-topic="javascript-intro"># js-intro</button>
+    <button class="topic-chip" data-topic="html-integration"># html-integration</button>
+    <button class="topic-chip" data-topic="browser-console"># console</button>
+    <button class="topic-chip" data-topic="let-const"># let-const</button>
+    <button class="topic-chip" data-topic="data-types"># data-types</button>
+    <button class="topic-chip" data-topic="interpolation"># interpolation</button>
+    <button class="topic-chip" data-topic="math-operations"># math-api</button>
+    <button class="topic-chip" data-topic="logical-operators"># logical-ops</button>
+    <button class="topic-chip" data-topic="ternary-nullish"># ternary-nullish</button>
+    <button class="topic-chip" data-topic="if-else"># if-else</button>
+
+    <div style="width: 100%; margin-top: 10px; font-weight: bold; font-size: 14px; text-transform: uppercase; color: var(--main-brown); opacity: 0.7;">— Intermediate —</div>
+    <button class="topic-chip" data-topic="loops-all"># loops-all</button>
+    <button class="topic-chip" data-topic="break-continue"># break-continue</button>
+    <button class="topic-chip" data-topic="nested-loops"># nested-loops</button>
+    <button class="topic-chip" data-topic="arrays-creation"># arrays-init</button>
+    <button class="topic-chip" data-topic="spread-operator"># spread-op</button>
+    <button class="topic-chip" data-topic="array-methods"># array-methods</button>
+    <button class="topic-chip" data-topic="string-methods"># string-methods</button>
+    <button class="topic-chip" data-topic="regex-methods"># regex-methods</button>
+    <button class="topic-chip" data-topic="functions-basics"># functions-closures</button>
+    <button class="topic-chip" data-topic="arrow-functions"># arrow-fns</button>
+
+    <div style="width: 100%; margin-top: 10px; font-weight: bold; font-size: 14px; text-transform: uppercase; color: var(--main-brown); opacity: 0.7;">— Advanced —</div>
+    <button class="topic-chip" data-topic="advanced-functions"># iife-recursion</button>
+    <button class="topic-chip" data-topic="hoisting"># hoisting</button>
+    <button class="topic-chip" data-topic="oop-classes"># oop-classes</button>
+    <button class="topic-chip" data-topic="private-methods"># private-members</button>
+    <button class="topic-chip" data-topic="getters-setters"># getters-setters</button>
+    <button class="topic-chip" data-topic="static-members"># static-members</button>
+    <button class="topic-chip" data-topic="mvc-pattern"># mvc-pattern</button>
+    <button class="topic-chip" data-topic="error-handling"># try-catch</button>
+    <button class="topic-chip" data-topic="advanced-oop"># advanced-oop</button>
+    <button class="topic-chip" data-topic="context-this"># context-this</button>
+    <button class="topic-chip" data-topic="object-cloning"># object-cloning</button>
+    <button class="topic-chip" data-topic="object-comparison"># object-compare</button>
+    <button class="topic-chip" data-topic="object-iterations"># object-utilities</button>
+    <button class="topic-chip" data-topic="objects-in-functions"># object-params</button>
+    <button class="topic-chip" data-topic="factory-constructors"># constructors</button>
+    <button class="topic-chip" data-topic="instanceof-operator"># instanceof</button>
+    <button class="topic-chip" data-topic="prototypes"># prototypes</button>
+    <button class="topic-chip" data-topic="constructor-prototype"># proto-mechanics</button>
+    <button class="topic-chip" data-topic="call-apply-bind"># call-apply-bind</button>
+    <button class="topic-chip" data-topic="property-descriptors"># meta-properties</button>
+</div>`;
+
 // DOM Elements
 const chatContainer = document.getElementById('chat-container');
 const userInput = document.getElementById('user-input');
@@ -500,10 +550,10 @@ userInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !userInput.disabled) handleSend();
 });
 
-// Event Delegation for Topic Chips (Клик по пиксельным кнопочкам тем)
+// Event Delegation for Topic Chips
 chatContainer.addEventListener('click', (e) => {
     if (e.target.classList.contains('topic-chip')) {
-        if (userInput.disabled) return; // Блокируем клик, если бот уже печатает
+        if (userInput.disabled) return;
         const selectedTopic = e.target.getAttribute('data-topic');
         sendTopic(selectedTopic);
     }
@@ -515,14 +565,14 @@ function sendTopic(topicName) {
     showTypingIndicator();
 }
 
-// Handling Send Action (Обычная отправка из инпута)
+// Handling Send Action
 function handleSend() {
     const text = userInput.value.trim();
     if (text === '') return;
 
     // Render user message
     appendMessage(text, 'user-message');
-    userInput.value = ''; // Clear the input field
+    userInput.value = '';
 
     // Show typing indicator
     showTypingIndicator();
@@ -533,7 +583,6 @@ function appendMessage(text, className) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', className);
     
-    // Если это приветственное сообщение от бота, сохраняем разметку чипсов
     if (className === 'bot-message' && text.includes('chips-container')) {
         messageDiv.innerHTML = text;
     } else {
@@ -541,11 +590,11 @@ function appendMessage(text, className) {
     }
     
     chatContainer.appendChild(messageDiv);
-    chatContainer.scrollTop = chatContainer.scrollHeight; // Auto-scroll to bottom
+    chatContainer.scrollTop = chatContainer.scrollHeight;
     return messageDiv;
 }
 
-// Переключение состояния элементов интерфейса (блокировка при печати)
+// Переключение состояния элементов интерфейса
 function setInterfaceDisabled(status) {
     userInput.disabled = status;
     sendBtn.disabled = status;
@@ -553,21 +602,28 @@ function setInterfaceDisabled(status) {
 
 // Typing Indicator delay ("Thinking...")
 function showTypingIndicator() {
-    setInterfaceDisabled(true); // Запрещаем ввод, пока бот думает
+    setInterfaceDisabled(true);
     const tempMessage = appendMessage('Hmm, thinking...', 'bot-message');
     
     setTimeout(() => {
-        tempMessage.remove(); // Remove temporary typing text
+        tempMessage.remove();
         generateBotResponse();
-    }, 1200); // 1.2s delay
+    }, 1200);
 }
 
 // Search database and start typing response
 function generateBotResponse() {
     const userMessages = document.querySelectorAll('.user-message');
-    const lastUserText = userMessages[userMessages.length - 1].innerText.toLowerCase();
+    const lastUserText = userMessages[userMessages.length - 1].innerText.toLowerCase().trim();
 
-    let reply = "Hmm, I don't know that topic yet. Try asking about: 'variables', 'functions', 'loops', 'objects', or 'arrays'.";
+    // Проверка на команду help
+    if (lastUserText === 'help') {
+        appendMessage(topicsChipsHTML, 'bot-message');
+        setInterfaceDisabled(false);
+        return;
+    }
+
+    let reply = "Hmm, I don't know that topic yet. Try asking about: 'variables', 'functions', 'loops', 'objects', or type 'help' to see all topics.";
 
     // Matching key terms
     for (const key in jsTopics) {
@@ -581,19 +637,19 @@ function generateBotResponse() {
     typeText(botMessageElement, reply);
 }
 
-// Typewriter Effect (Time Delay)
+// Typewriter Effect
 function typeText(element, text) {
     let index = 0;
-    const speed = 15; // Delay in ms between each character
+    const speed = 15;
 
     function type() {
         if (index < text.length) {
             element.innerText += text.charAt(index);
             index++;
-            chatContainer.scrollTop = chatContainer.scrollHeight; // Constant scrolling
+            chatContainer.scrollTop = chatContainer.scrollHeight;
             setTimeout(type, speed);
         } else {
-            setInterfaceDisabled(false); // Возвращаем доступ к инпуту, когда бот закончил[cite: 12]
+            setInterfaceDisabled(false);
         }
     }
     type();
