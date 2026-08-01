@@ -552,13 +552,8 @@ let activeChatId = null;
 init();
 
 function init() {
-    if (chats.length === 0) {
-        createNewChat();
-    } else {
-        activeChatId = chats[0].id;
-        renderSidebar();
-        loadActiveChat();
-    }
+    renderSidebar();
+    createNewChat();
 }
 
 function saveToLocalStorage() {
