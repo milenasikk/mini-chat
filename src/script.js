@@ -545,6 +545,7 @@ const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 const historyList = document.getElementById('history-list');
 const newChatBtn = document.getElementById('new-chat-btn');
+const searchInput = document.getElementById('search-input');
 
 let chats = JSON.parse(localStorage.getItem('minichat_history')) || [];
 let activeChatId = null;
@@ -592,10 +593,28 @@ function deleteChat(chatId) {
     }
 }
 
+function renameChat(chatId) {
+    const targetChat = chats.find(c => c.id === chatId);
+    if (!targetChat) return;
+
+    const newTitle = prompt("Enter new chat title:", targetChat.title);
+    if (newTitle && newTitle.trim() !== "") {
+        targetChat.title = newTitle.trim();
+        saveToLocalStorage();
+        renderSidebar();
+    }
+}
+
 function renderSidebar() {
     historyList.innerHTML = '';
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
     
-    chats.forEach(chat => {
+    const filteredChats = chats.filter(chat => 
+        chat.title.toLowerCase().includes(query) ||
+        chat.messages.some(m => m.text.toLowerCase().includes(query))
+    );
+
+    filteredChats.forEach(chat => {
         const li = document.createElement('li');
         
         const chatItemDiv = document.createElement('div');
@@ -606,8 +625,21 @@ function renderSidebar() {
         titleSpan.classList.add('chat-title-text');
         titleSpan.innerText = chat.title;
 
+        const actionsDiv = document.createElement('div');
+        actionsDiv.classList.add('chat-actions');
+
+        const editBtn = document.createElement('button');
+        editBtn.classList.add('action-btn', 'edit-btn');
+        editBtn.innerHTML = '✏️';
+        editBtn.title = 'Rename chat';
+
+        editBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            renameChat(chat.id);
+        });
+
         const deleteBtn = document.createElement('button');
-        deleteBtn.classList.add('delete-chat-btn');
+        deleteBtn.classList.add('action-btn', 'delete-btn');
         deleteBtn.innerHTML = '✖';
         deleteBtn.title = 'Delete chat';
 
@@ -623,11 +655,18 @@ function renderSidebar() {
             loadActiveChat();
         });
 
+        actionsDiv.appendChild(editBtn);
+        actionsDiv.appendChild(deleteBtn);
+
         chatItemDiv.appendChild(titleSpan);
-        chatItemDiv.appendChild(deleteBtn);
+        chatItemDiv.appendChild(actionsDiv);
         li.appendChild(chatItemDiv);
         historyList.appendChild(li);
     });
+}
+
+if (searchInput) {
+    searchInput.addEventListener('input', renderSidebar);
 }
 
 function loadActiveChat() {
@@ -650,14 +689,11 @@ userInput.addEventListener('keydown', (e) => {
 chatContainer.addEventListener('click', (e) => {
     if (e.target.classList.contains('topic-chip')) {
         if (userInput.disabled) return;
-        const selectedTopic = e.target.getAttribute('data-topic');
-        sendTopic(selectedTopic);
+        const topicKey = e.target.getAttribute('data-topic');
+        const displayText = e.target.innerText; // Берем видимый текст кнопки (# js-intro)
+        processUserMessage(displayText, topicKey);
     }
 });
-
-function sendTopic(topicName) {
-    processUserMessage(topicName);
-}
 
 function handleSend() {
     const text = userInput.value.trim();
@@ -667,7 +703,7 @@ function handleSend() {
     processUserMessage(text);
 }
 
-function processUserMessage(text) {
+function processUserMessage(text, topicKey = null) {
     const activeChat = chats.find(c => c.id === activeChatId);
     
     if (activeChat.title === "New Chat") {
@@ -679,15 +715,44 @@ function processUserMessage(text) {
     appendMessageToDOM(text, 'user-message');
     saveToLocalStorage();
 
-    showTypingIndicator();
+    showTypingIndicator(topicKey);
+}
+
+function formatMessageContent(text) {
+    if (text.includes("Code Example:")) {
+        const parts = text.split("Code Example:");
+        const mainText = parts[0];
+        const codeText = parts[1].trim();
+
+        return `${mainText}
+<div class="code-block-wrapper">
+    <button class="copy-code-btn">Copy 📋</button>
+    <pre><code>${codeText}</code></pre>
+</div>`;
+    }
+    return text;
 }
 
 function appendMessageToDOM(text, className) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', className);
     
-    if (className === 'bot-message' && (text.includes('chips-container') || text.includes('Hi there!'))) {
-        messageDiv.innerHTML = text;
+    if (className === 'bot-message') {
+        const formatted = formatMessageContent(text);
+        messageDiv.innerHTML = formatted;
+
+        const copyBtn = messageDiv.querySelector('.copy-code-btn');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => {
+                const codeElement = messageDiv.querySelector('code');
+                if (codeElement) {
+                    navigator.clipboard.writeText(codeElement.innerText).then(() => {
+                        copyBtn.innerText = 'Copied! ✔';
+                        setTimeout(() => { copyBtn.innerText = 'Copy 📋'; }, 2000);
+                    });
+                }
+            });
+        }
     } else {
         messageDiv.innerText = text;
     }
@@ -702,17 +767,17 @@ function setInterfaceDisabled(status) {
     sendBtn.disabled = status;
 }
 
-function showTypingIndicator() {
+function showTypingIndicator(topicKey = null) {
     setInterfaceDisabled(true);
     const tempMessage = appendMessageToDOM('Hmm, thinking...', 'bot-message');
     
     setTimeout(() => {
         tempMessage.remove();
-        generateBotResponse();
+        generateBotResponse(topicKey);
     }, 1200);
 }
 
-function generateBotResponse() {
+function generateBotResponse(topicKey = null) {
     const activeChat = chats.find(c => c.id === activeChatId);
     const userMessages = activeChat.messages.filter(m => m.className === 'user-message');
     
@@ -721,6 +786,7 @@ function generateBotResponse() {
     const lastUserText = userMessages[userMessages.length - 1].text
         .toLowerCase()
         .replace(/\s+/g, ' ')
+        .replace('#', '')
         .trim();
 
     if (lastUserText === 'help') {
@@ -732,63 +798,65 @@ function generateBotResponse() {
     }
 
     const topicKeywords = {
-        "javascript-intro": ["js", "javascript", "intro", "what is js"],
-        "html-integration": ["html", "script", "dom"],
+        "javascript-intro": ["js", "javascript", "intro", "what is js", "js-intro"],
+        "html-integration": ["html", "script", "dom", "html-integration"],
         "browser-console": ["console", "log", "debug"],
-        "let-const": ["let", "const", "var", "variable", "variables"],
+        "let-const": ["let", "const", "var", "variable", "variables", "let-const"],
         "data-types": ["data type", "data types", "primitive", "string", "number", "boolean"],
         "interpolation": ["interpolation", "template literal", "backtick"],
-        "math-operations": ["math", "calculator", "operator", "operators"],
-        "logical-operators": ["logical", "and", "or", "not"],
+        "math-operations": ["math", "calculator", "operator", "operators", "math-api"],
+        "logical-operators": ["logical", "and", "or", "not", "logical-ops"],
         "ternary-nullish": ["ternary", "nullish"],
         "if-else": ["if", "else", "condition", "conditional"],
         "loops-all": ["loop", "loops", "for", "while"],
         "break-continue": ["break", "continue"],
         "nested-loops": ["nested loop", "nested loops"],
         "arrays-creation": ["array", "arrays", "arrays-init"],
-        "spread-operator": ["spread", "spread operator"],
+        "spread-operator": ["spread", "spread operator", "spread-op"],
         "array-methods": ["array method", "array methods", "map", "filter", "reduce", "push", "pop"],
         "string-methods": ["string method", "string methods"],
         "regex-methods": ["regex", "regexp", "regular expression"],
-        "functions-basics": ["function", "functions", "closure", "closures"],
-        "arrow-functions": ["arrow function", "arrow functions", "arrow"],
-        "advanced-functions": ["iife", "recursion"],
+        "functions-basics": ["function", "functions", "closure", "closures", "functions-closures"],
+        "arrow-functions": ["arrow function", "arrow functions", "arrow", "arrow-fns"],
+        "advanced-functions": ["iife", "recursion", "iife-recursion"],
         "hoisting": ["hoisting"],
         "oop-classes": ["class", "classes", "oop", "object oriented"],
-        "private-methods": ["private", "private method", "private field"],
+        "private-methods": ["private", "private method", "private field", "private-members"],
         "getters-setters": ["getter", "getters", "setter", "setters"],
-        "static-members": ["static"],
+        "static-members": ["static", "static-members"],
         "mvc-pattern": ["mvc", "model view controller"],
         "error-handling": ["try", "catch", "try catch", "error"],
         "advanced-oop": ["delete operator", "box wrappers"],
         "context-this": ["this", "context", "globalthis"],
         "object-cloning": ["clone", "cloning", "structuredclone", "shallow copy", "deep copy"],
         "object-comparison": ["object compare", "object comparison"],
-        "object-iterations": ["object keys", "object values", "object entries"],
+        "object-iterations": ["object keys", "object values", "object entries", "object-utilities"],
         "objects-in-functions": ["destructuring", "object params"],
         "factory-constructors": ["constructor", "constructors", "factory"],
         "instanceof-operator": ["instanceof"],
         "prototypes": ["prototype", "prototypes", "proto"],
-        "constructor-prototype": ["constructor prototype"],
+        "constructor-prototype": ["constructor prototype", "proto-mechanics"],
         "call-apply-bind": ["call", "apply", "bind"],
-        "property-descriptors": ["property descriptors", "defineproperty"]
+        "property-descriptors": ["property descriptors", "defineproperty", "meta-properties"]
     };
 
-    let matchedTopicKey = null;
+    let matchedTopicKey = topicKey;
 
-    if (jsTopics[lastUserText]) {
-        matchedTopicKey = lastUserText;
-    } else {
-        for (const [topicKey, keywords] of Object.entries(topicKeywords)) {
-            const hasMatch = keywords.some(keyword => lastUserText.includes(keyword));
-            if (hasMatch) {
-                matchedTopicKey = topicKey;
-                break;
+    if (!matchedTopicKey) {
+        if (jsTopics[lastUserText]) {
+            matchedTopicKey = lastUserText;
+        } else {
+            for (const [key, keywords] of Object.entries(topicKeywords)) {
+                const hasMatch = keywords.some(keyword => lastUserText.includes(keyword));
+                if (hasMatch) {
+                    matchedTopicKey = key;
+                    break;
+                }
             }
         }
     }
 
-    let reply = matchedTopicKey 
+    let reply = matchedTopicKey && jsTopics[matchedTopicKey]
         ? jsTopics[matchedTopicKey] 
         : "Hmm, I don't know that topic yet. Try asking about: 'variables', 'functions', 'loops', 'objects', or type 'help' to see all topics.";
 
@@ -810,6 +878,22 @@ function typeText(element, text, onComplete) {
             chatContainer.scrollTop = chatContainer.scrollHeight;
             setTimeout(type, speed);
         } else {
+            const fullFormatted = formatMessageContent(text);
+            element.innerHTML = fullFormatted;
+
+            const copyBtn = element.querySelector('.copy-code-btn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', () => {
+                    const codeElement = element.querySelector('code');
+                    if (codeElement) {
+                        navigator.clipboard.writeText(codeElement.innerText).then(() => {
+                            copyBtn.innerText = 'Copied! ✔';
+                            setTimeout(() => { copyBtn.innerText = 'Copy 📋'; }, 2000);
+                        });
+                    }
+                });
+            }
+
             setInterfaceDisabled(false);
             if (onComplete) onComplete();
         }
