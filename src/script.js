@@ -690,7 +690,7 @@ chatContainer.addEventListener('click', (e) => {
     if (e.target.classList.contains('topic-chip')) {
         if (userInput.disabled) return;
         const topicKey = e.target.getAttribute('data-topic');
-        const displayText = e.target.innerText; // Берем видимый текст кнопки (# js-intro)
+        const displayText = e.target.innerText;
         processUserMessage(displayText, topicKey);
     }
 });
