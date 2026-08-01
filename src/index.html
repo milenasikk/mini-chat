@@ -20,16 +20,18 @@
             <li><a href="#">History</a></li>
             <li><a href="#">Settings</a></li>
         </ul>
+        
+        <p class="sidebar-section-title">Recent Chats</p>
+        <ul class="history-menu" id="history-list">
+        </ul>
+
+        <button class="new-chat-btn" id="new-chat-btn">+ New Chat</button>
     </div>
 
     <div class="home">
         <p class="title">Mini Chat</p>
 
         <div class="chat-container" id="chat-container">
-            <div class="message bot-message">
-                <p style="margin: 0 0 10px 0;">Hi there! I am your pixelated JS helper. Ask me about any JS topic (for example: "variables", "loops", "functions", "arrays", "objects"), and I will explain it in detail!</p>
-                <p style="margin: 0;">If you don't know where to start, type <strong>"help"</strong> to show all topics.</p>
-            </div>
         </div>
 
         <div class="input-container">
@@ -40,7 +42,6 @@
         <div class="icon">
             <img src="assets/chat.png" class="logo">
         </div>
-
     </div>
     
     <script src="script.js"></script>

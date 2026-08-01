@@ -538,9 +538,114 @@ Here are all available topics:
     <button class="topic-chip" data-topic="property-descriptors"># meta-properties</button>
 </div>`;
 
+const initialBotGreeting = `<p style="margin: 0 0 10px 0;">Hi there! I am your pixelated JS helper. Ask me about any JS topic (for example: "variables", "loops", "functions", "arrays", "objects"), and I will explain it in detail!</p><p style="margin: 0;">If you don't know where to start, type <strong>"help"</strong> to show all topics.</p>`;
+
 const chatContainer = document.getElementById('chat-container');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
+const historyList = document.getElementById('history-list');
+const newChatBtn = document.getElementById('new-chat-btn');
+
+let chats = JSON.parse(localStorage.getItem('minichat_history')) || [];
+let activeChatId = null;
+
+init();
+
+function init() {
+    if (chats.length === 0) {
+        createNewChat();
+    } else {
+        activeChatId = chats[0].id;
+        renderSidebar();
+        loadActiveChat();
+    }
+}
+
+function saveToLocalStorage() {
+    localStorage.setItem('minichat_history', JSON.stringify(chats));
+}
+
+function createNewChat() {
+    const newChat = {
+        id: Date.now(),
+        title: "New Chat",
+        messages: [
+            { text: initialBotGreeting, className: 'bot-message' }
+        ]
+    };
+
+    chats.unshift(newChat);
+    activeChatId = newChat.id;
+    saveToLocalStorage();
+    renderSidebar();
+    loadActiveChat();
+}
+
+function deleteChat(chatId) {
+    chats = chats.filter(c => c.id !== chatId);
+    
+    if (chats.length === 0) {
+        saveToLocalStorage();
+        createNewChat();
+    } else {
+        if (activeChatId === chatId) {
+            activeChatId = chats[0].id;
+        }
+        saveToLocalStorage();
+        renderSidebar();
+        loadActiveChat();
+    }
+}
+
+function renderSidebar() {
+    historyList.innerHTML = '';
+    
+    chats.forEach(chat => {
+        const li = document.createElement('li');
+        
+        const chatItemDiv = document.createElement('div');
+        chatItemDiv.classList.add('chat-item');
+        if (chat.id === activeChatId) chatItemDiv.classList.add('active');
+
+        const titleSpan = document.createElement('span');
+        titleSpan.classList.add('chat-title-text');
+        titleSpan.innerText = chat.title;
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.classList.add('delete-chat-btn');
+        deleteBtn.innerHTML = '✖';
+        deleteBtn.title = 'Delete chat';
+
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteChat(chat.id);
+        });
+
+        chatItemDiv.addEventListener('click', () => {
+            if (activeChatId === chat.id) return;
+            activeChatId = chat.id;
+            renderSidebar();
+            loadActiveChat();
+        });
+
+        chatItemDiv.appendChild(titleSpan);
+        chatItemDiv.appendChild(deleteBtn);
+        li.appendChild(chatItemDiv);
+        historyList.appendChild(li);
+    });
+}
+
+function loadActiveChat() {
+    chatContainer.innerHTML = '';
+    const activeChat = chats.find(c => c.id === activeChatId);
+    if (!activeChat) return;
+
+    activeChat.messages.forEach(msg => {
+        appendMessageToDOM(msg.text, msg.className);
+    });
+}
+
+newChatBtn.addEventListener('click', createNewChat);
 
 sendBtn.addEventListener('click', handleSend);
 userInput.addEventListener('keydown', (e) => {
@@ -556,25 +661,37 @@ chatContainer.addEventListener('click', (e) => {
 });
 
 function sendTopic(topicName) {
-    appendMessage(topicName, 'user-message');
-    showTypingIndicator();
+    processUserMessage(topicName);
 }
 
 function handleSend() {
     const text = userInput.value.trim();
     if (text === '') return;
 
-    appendMessage(text, 'user-message');
     userInput.value = '';
+    processUserMessage(text);
+}
+
+function processUserMessage(text) {
+    const activeChat = chats.find(c => c.id === activeChatId);
+    
+    if (activeChat.title === "New Chat") {
+        activeChat.title = text;
+        renderSidebar();
+    }
+
+    activeChat.messages.push({ text: text, className: 'user-message' });
+    appendMessageToDOM(text, 'user-message');
+    saveToLocalStorage();
 
     showTypingIndicator();
 }
 
-function appendMessage(text, className) {
+function appendMessageToDOM(text, className) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', className);
     
-    if (className === 'bot-message' && text.includes('chips-container')) {
+    if (className === 'bot-message' && (text.includes('chips-container') || text.includes('Hi there!'))) {
         messageDiv.innerHTML = text;
     } else {
         messageDiv.innerText = text;
@@ -592,7 +709,7 @@ function setInterfaceDisabled(status) {
 
 function showTypingIndicator() {
     setInterfaceDisabled(true);
-    const tempMessage = appendMessage('Hmm, thinking...', 'bot-message');
+    const tempMessage = appendMessageToDOM('Hmm, thinking...', 'bot-message');
     
     setTimeout(() => {
         tempMessage.remove();
@@ -601,15 +718,20 @@ function showTypingIndicator() {
 }
 
 function generateBotResponse() {
-    const userMessages = document.querySelectorAll('.user-message');
+    const activeChat = chats.find(c => c.id === activeChatId);
+    const userMessages = activeChat.messages.filter(m => m.className === 'user-message');
     
-    const lastUserText = userMessages[userMessages.length - 1].innerText
+    if (userMessages.length === 0) return;
+
+    const lastUserText = userMessages[userMessages.length - 1].text
         .toLowerCase()
         .replace(/\s+/g, ' ')
         .trim();
 
     if (lastUserText === 'help') {
-        appendMessage(topicsChipsHTML, 'bot-message');
+        activeChat.messages.push({ text: topicsChipsHTML, className: 'bot-message' });
+        saveToLocalStorage();
+        appendMessageToDOM(topicsChipsHTML, 'bot-message');
         setInterfaceDisabled(false);
         return;
     }
@@ -675,11 +797,14 @@ function generateBotResponse() {
         ? jsTopics[matchedTopicKey] 
         : "Hmm, I don't know that topic yet. Try asking about: 'variables', 'functions', 'loops', 'objects', or type 'help' to see all topics.";
 
-    const botMessageElement = appendMessage('', 'bot-message');
-    typeText(botMessageElement, reply);
+    const botMessageElement = appendMessageToDOM('', 'bot-message');
+    typeText(botMessageElement, reply, () => {
+        activeChat.messages.push({ text: reply, className: 'bot-message' });
+        saveToLocalStorage();
+    });
 }
 
-function typeText(element, text) {
+function typeText(element, text, onComplete) {
     let index = 0;
     const speed = 15;
 
@@ -691,6 +816,7 @@ function typeText(element, text) {
             setTimeout(type, speed);
         } else {
             setInterfaceDisabled(false);
+            if (onComplete) onComplete();
         }
     }
     type();
