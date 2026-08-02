@@ -491,7 +491,7 @@ Object.defineProperty(strictObj, 'id', {
 const topicsChipsHTML = `
 Here are all available topics:
 <div class="chips-container">
-    <div style="width: 100%; margin-top: 5px; font-weight: bold; font-size: 14px; text-transform: uppercase; color: var(--main-brown); opacity: 0.7;">— Beginner —</div>
+    <div style="width: 100%; margin-top: 5px; font-weight: bold; font-size: 14px; text-transform: uppercase; color: var(--main-red); opacity: 0.7;">— Beginner —</div>
     <button class="topic-chip" data-topic="javascript-intro"># js-intro</button>
     <button class="topic-chip" data-topic="html-integration"># html-integration</button>
     <button class="topic-chip" data-topic="browser-console"># console</button>
@@ -503,7 +503,7 @@ Here are all available topics:
     <button class="topic-chip" data-topic="ternary-nullish"># ternary-nullish</button>
     <button class="topic-chip" data-topic="if-else"># if-else</button>
 
-    <div style="width: 100%; margin-top: 10px; font-weight: bold; font-size: 14px; text-transform: uppercase; color: var(--main-brown); opacity: 0.7;">— Intermediate —</div>
+    <div style="width: 100%; margin-top: 10px; font-weight: bold; font-size: 14px; text-transform: uppercase; color: var(--main-red); opacity: 0.7;">— Intermediate —</div>
     <button class="topic-chip" data-topic="loops-all"># loops-all</button>
     <button class="topic-chip" data-topic="break-continue"># break-continue</button>
     <button class="topic-chip" data-topic="nested-loops"># nested-loops</button>
@@ -515,7 +515,7 @@ Here are all available topics:
     <button class="topic-chip" data-topic="functions-basics"># functions-closures</button>
     <button class="topic-chip" data-topic="arrow-functions"># arrow-fns</button>
 
-    <div style="width: 100%; margin-top: 10px; font-weight: bold; font-size: 14px; text-transform: uppercase; color: var(--main-brown); opacity: 0.7;">— Advanced —</div>
+    <div style="width: 100%; margin-top: 10px; font-weight: bold; font-size: 14px; text-transform: uppercase; color: var(--main-red); opacity: 0.7;">— Advanced —</div>
     <button class="topic-chip" data-topic="advanced-functions"># iife-recursion</button>
     <button class="topic-chip" data-topic="hoisting"># hoisting</button>
     <button class="topic-chip" data-topic="oop-classes"># oop-classes</button>
@@ -591,18 +591,17 @@ let activeChatId = null;
 const defaultSettings = {
     effectsEnabled: true,
     theme: 'light',
-    accentColor: 'brown',
+    accentColor: 'red',
     fontSize: 'medium'
 };
 
 let settings = { ...defaultSettings, ...(JSON.parse(localStorage.getItem('minichat_settings')) || {}) };
 
 const accentPalette = {
-    brown: { main: 'rgb(73, 22, 8)', light: 'rgba(73, 22, 8, 0.1)' },
+    red: { main: 'rgb(110, 26, 26)', light: 'rgba(110, 26, 26, 0.1)' },
     blue: { main: 'rgb(20, 60, 110)', light: 'rgba(20, 60, 110, 0.1)' },
     green: { main: 'rgb(24, 74, 44)', light: 'rgba(24, 74, 44, 0.1)' },
-    purple: { main: 'rgb(66, 25, 90)', light: 'rgba(66, 25, 90, 0.1)' },
-    red: { main: 'rgb(110, 26, 26)', light: 'rgba(110, 26, 26, 0.1)' }
+    purple: { main: 'rgb(66, 25, 90)', light: 'rgba(66, 25, 90, 0.1)' }
 };
 
 const fontSizeMap = {
@@ -622,8 +621,8 @@ function applySettings() {
     document.body.classList.toggle('effects-disabled', !settings.effectsEnabled);
     document.body.classList.toggle('theme-dark', settings.theme === 'dark');
 
-    const palette = accentPalette[settings.accentColor] || accentPalette.brown;
-    document.documentElement.style.setProperty('--main-brown', palette.main);
+    const palette = accentPalette[settings.accentColor] || accentPalette.red;
+    document.documentElement.style.setProperty('--main-red', palette.main);
     document.documentElement.style.setProperty('--accent-light', palette.light);
 
     document.documentElement.style.setProperty('--chat-font-size', fontSizeMap[settings.fontSize] || fontSizeMap.medium);
@@ -1013,7 +1012,7 @@ function renameChat(chatId) {
     editInput.style.cssText = `
         width: 100%;
         background: rgba(247, 247, 255, 0.2);
-        border: 1px solid var(--text-on-brown);
+        border: 1px solid var(--text-on-red);
         color: inherit;
         font-family: inherit;
         font-size: 14px;
