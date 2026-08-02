@@ -29,7 +29,6 @@ body {
     z-index: -1;
 }
 
-/* --- OBSOLUTE TEXTURED SIDEBAR --- */
 .sidebar {
     position: fixed;
     left: 0; 
@@ -164,15 +163,6 @@ body {
     margin: 0 0 15px 0;
     overflow-y: auto;
     flex: 1;
-}
-
-.history-menu::-webkit-scrollbar {
-    width: 4px;
-}
-
-.history-menu::-webkit-scrollbar-thumb {
-    background: rgba(247, 247, 255, 0.3);
-    border-radius: 2px;
 }
 
 .history-menu li {
@@ -317,21 +307,6 @@ body {
     background: transparent;
     border: none;
     box-shadow: none;
-}
-
-.chat-container::-webkit-scrollbar {
-    width: 8px;
-}
-
-.chat-container::-webkit-scrollbar-track {
-    background: rgba(73, 22, 8, 0.05);
-    border-radius: 4px;
-}
-
-.chat-container::-webkit-scrollbar-thumb {
-    background: var(--main-brown);
-    border-radius: 4px;
-    border: 2px solid rgba(255,255,255,0.5);
 }
 
 .message {
@@ -776,7 +751,6 @@ body.effects-disabled .typing-dots span { animation: none; opacity: 0.7; }
 
 .settings-btn-group { display: flex; gap: 8px; }
 
-/* --- DARK THEME --- */
 body.theme-dark { --bg-color: rgb(24, 22, 28); }
 body.theme-dark .bg-overlay {
     background-image:
@@ -803,7 +777,6 @@ body.theme-dark .toggle-slider { background-color: rgba(255, 255, 255, 0.08); }
 body.theme-dark .toggle-slider::before { background-color: rgb(230, 226, 235); }
 body.theme-dark .typing-dots span { background: rgb(230, 226, 235); }
 
-/* --- CONFIRMATION DIALOG --- */
 .confirm-overlay {
     display: none;
     position: fixed;
@@ -828,28 +801,27 @@ body.theme-dark .typing-dots span { background: rgb(230, 226, 235); }
 .confirm-actions { display: flex; justify-content: center; gap: 12px; }
 .confirm-actions .settings-btn { flex: 1; text-align: center; justify-content: center; }
 
-/* --- CUSTOM RETRO SCROLLBAR --- */
-body.custom-scrollbar-enabled ::-webkit-scrollbar {
+::-webkit-scrollbar {
     width: 14px;
     height: 14px;
 }
 
-body.custom-scrollbar-enabled ::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
     background: rgba(40, 10, 3, 0.15);
     border-left: 2px solid var(--main-brown);
 }
 
-body.custom-scrollbar-enabled ::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
     background: var(--main-brown);
     border: 2px solid var(--text-on-brown);
     box-shadow: inset -2px -2px 0px rgba(0, 0, 0, 0.4), inset 2px 2px 0px rgba(255, 255, 255, 0.2);
 }
 
-body.custom-scrollbar-enabled ::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
     background: rgb(110, 33, 12);
 }
 
-body.custom-scrollbar-enabled ::-webkit-scrollbar-button:single-button {
+::-webkit-scrollbar-button:single-button {
     background-color: var(--main-brown);
     display: block;
     border: 2px solid var(--text-on-brown);
@@ -857,18 +829,18 @@ body.custom-scrollbar-enabled ::-webkit-scrollbar-button:single-button {
     width: 14px;
 }
 
-body.custom-scrollbar-enabled ::-webkit-scrollbar-button:single-button:vertical:decrement {
+::-webkit-scrollbar-button:single-button:vertical:decrement {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><polygon points="4,1 1,6 7,6" fill="%23f7f7ff"/></svg>');
     background-repeat: no-repeat;
     background-position: center;
 }
 
-body.custom-scrollbar-enabled ::-webkit-scrollbar-button:single-button:vertical:increment {
+::-webkit-scrollbar-button:single-button:vertical:increment {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><polygon points="1,2 7,2 4,7" fill="%23f7f7ff"/></svg>');
     background-repeat: no-repeat;
     background-position: center;
 }
 
-body.custom-scrollbar-enabled ::-webkit-scrollbar-button:single-button:hover {
+::-webkit-scrollbar-button:single-button:hover {
     background-color: rgb(110, 33, 12);
 }
