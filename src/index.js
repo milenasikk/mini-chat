@@ -13,6 +13,8 @@ const createWindow = () => {
     height: 700,
     minWidth: 800,
     minHeight: 600,
+    show: false, // Скрываем окно до момента полной готовности
+    backgroundColor: '#f0f0fa', // Устанавливаем стартовый фоновый цвет (из --bg-color в index.css)
     icon: path.join(__dirname, 'assets/icon.ico'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -22,6 +24,11 @@ const createWindow = () => {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
+
+  // Показываем окно только после того, как интерфейс полностью подготовился к отрисовке
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+  });
 };
 
 app.whenReady().then(() => {

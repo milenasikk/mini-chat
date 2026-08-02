@@ -552,6 +552,7 @@ const settingsOverlay = document.getElementById('settings-overlay');
 const settingsCloseBtn = document.getElementById('settings-close-btn');
 const effectsToggle = document.getElementById('effects-toggle');
 const themeToggle = document.getElementById('theme-toggle');
+const scrollbarToggle = document.getElementById('scrollbar-toggle');
 const accentSwatches = document.getElementById('accent-swatches');
 const fontSizeSwitch = document.getElementById('font-size-switch');
 const exportTxtBtn = document.getElementById('export-txt-btn');
@@ -592,7 +593,8 @@ const defaultSettings = {
     effectsEnabled: true,
     theme: 'light',
     accentColor: 'brown',
-    fontSize: 'medium'
+    fontSize: 'medium',
+    customScrollbar: true
 };
 
 let settings = { ...defaultSettings, ...(JSON.parse(localStorage.getItem('minichat_settings')) || {}) };
@@ -621,6 +623,7 @@ function saveSettingsToLocalStorage() {
 function applySettings() {
     document.body.classList.toggle('effects-disabled', !settings.effectsEnabled);
     document.body.classList.toggle('theme-dark', settings.theme === 'dark');
+    document.body.classList.toggle('custom-scrollbar-enabled', settings.customScrollbar !== false);
 
     const palette = accentPalette[settings.accentColor] || accentPalette.brown;
     document.documentElement.style.setProperty('--main-brown', palette.main);
@@ -630,6 +633,7 @@ function applySettings() {
 
     if (effectsToggle) effectsToggle.checked = settings.effectsEnabled;
     if (themeToggle) themeToggle.checked = settings.theme === 'dark';
+    if (scrollbarToggle) scrollbarToggle.checked = settings.customScrollbar !== false;
 
     if (accentSwatches) {
         accentSwatches.querySelectorAll('.accent-swatch').forEach(btn => {
@@ -681,6 +685,14 @@ function initSettings() {
     if (themeToggle) {
         themeToggle.addEventListener('change', () => {
             settings.theme = themeToggle.checked ? 'dark' : 'light';
+            saveSettingsToLocalStorage();
+            applySettings();
+        });
+    }
+
+    if (scrollbarToggle) {
+        scrollbarToggle.addEventListener('change', () => {
+            settings.customScrollbar = scrollbarToggle.checked;
             saveSettingsToLocalStorage();
             applySettings();
         });
@@ -751,9 +763,7 @@ function showConfirmDialog(message, onConfirm) {
 }
 
 function showInfoDialog(message) {
-    if (!confirmOverlay) {
-        return;
-    }
+    if (!confirmOverlay) return;
     confirmMessage.innerText = message;
     if (confirmCancelBtn) confirmCancelBtn.style.display = 'none';
     if (confirmOkBtn) confirmOkBtn.innerText = 'OK';
