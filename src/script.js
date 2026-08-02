@@ -553,8 +553,13 @@ let activeChatId = null;
 init();
 
 function init() {
-    renderSidebar();
-    createNewChat();
+    if (chats.length > 0) {
+        activeChatId = chats[0].id;
+        renderSidebar();
+        loadActiveChat();
+    } else {
+        createNewChat();
+    }
 }
 
 function saveToLocalStorage() {
