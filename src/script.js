@@ -601,7 +601,8 @@ const accentPalette = {
     red: { main: 'rgb(110, 26, 26)', light: 'rgba(110, 26, 26, 0.1)' },
     blue: { main: 'rgb(20, 60, 110)', light: 'rgba(20, 60, 110, 0.1)' },
     green: { main: 'rgb(24, 74, 44)', light: 'rgba(24, 74, 44, 0.1)' },
-    purple: { main: 'rgb(66, 25, 90)', light: 'rgba(66, 25, 90, 0.1)' }
+    purple: { main: 'rgb(66, 25, 90)', light: 'rgba(66, 25, 90, 0.1)' },
+    yellow: { main: 'rgb(180, 130, 20)', light: 'rgba(180, 130, 20, 0.1)' }
 };
 
 const fontSizeMap = {
