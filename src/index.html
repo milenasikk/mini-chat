@@ -17,7 +17,7 @@
         <p class="sidebar-title">Menu</p>
         <ul class="sidebar-menu">
             <li><a href="#" class="active">Chat</a></li>
-            <li><a href="#">Settings</a></li>
+            <li><a href="#" id="settings-link">Settings</a></li>
         </ul>
 
         <p class="sidebar-section-title">Recent Chats</p>
@@ -48,6 +48,72 @@
         </div>
     </div>
     
+    <div class="settings-overlay" id="settings-overlay">
+        <div class="settings-modal">
+            <div class="settings-header">
+                <p class="settings-title">Settings</p>
+                <button class="settings-close-btn" id="settings-close-btn">✖</button>
+            </div>
+
+            <div class="settings-body">
+                <div class="settings-row">
+                    <div class="settings-row-text">
+                        <p class="settings-label">Animations</p>
+                        <p class="settings-hint">Turn visual effects on/off (pulsing logo, message pop-in)</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="effects-toggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="settings-divider"></div>
+
+                <div class="settings-row">
+                    <div class="settings-row-text">
+                        <p class="settings-label">Export Chats</p>
+                        <p class="settings-hint">Download all chats as a .txt file</p>
+                    </div>
+                    <button class="settings-btn" id="export-btn">Export .txt</button>
+                </div>
+
+                <div class="settings-divider"></div>
+
+                <div class="settings-row">
+                    <div class="settings-row-text">
+                        <p class="settings-label">Clear History</p>
+                        <p class="settings-hint">Permanently delete all chats</p>
+                    </div>
+                    <button class="settings-btn settings-btn-danger" id="clear-history-btn">Clear All Chats</button>
+                </div>
+
+                <div class="settings-divider"></div>
+
+                <div class="settings-row">
+                    <div class="settings-row-text">
+                        <p class="settings-label">Reset Settings</p>
+                        <p class="settings-hint">Restore all settings to their default values</p>
+                    </div>
+                    <button class="settings-btn" id="reset-settings-btn">Reset to Default</button>
+                </div>
+            </div>
+
+            <div class="settings-footer">
+                <p class="settings-version">Mini Chat v1.0.0</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="confirm-overlay" id="confirm-overlay">
+        <div class="confirm-modal">
+            <p class="confirm-message" id="confirm-message"></p>
+            <div class="confirm-actions">
+                <button class="settings-btn" id="confirm-cancel-btn">Cancel</button>
+                <button class="settings-btn settings-btn-danger" id="confirm-ok-btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

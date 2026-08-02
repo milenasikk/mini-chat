@@ -508,3 +508,259 @@ body {
     50% { transform: scale(1.05); opacity: 1; }
     100% { transform: scale(1); opacity: 0.9; }
 }
+
+/* --- ОТКЛЮЧЕНИЕ ЭФФЕКТОВ --- */
+body.effects-disabled .message {
+    animation: none !important;
+}
+
+body.effects-disabled .logo {
+    animation: none !important;
+}
+
+/* --- ОКНО НАСТРОЕК --- */
+.settings-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(73, 22, 8, 0.35);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-overlay.open {
+    display: flex;
+}
+
+.settings-modal {
+    width: 460px;
+    max-width: 90vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    background-color: var(--bg-color);
+    border: 3px solid var(--main-brown);
+    border-radius: 12px;
+    box-shadow: 6px 6px 0px rgba(73, 22, 8, 0.2), 0 10px 30px rgba(0, 0, 0, 0.25);
+    font-family: var(--pixel-font);
+    color: var(--main-brown);
+    animation: messageAppear 0.25s ease-out;
+}
+
+.settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 3px dashed var(--main-brown);
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 9px 9px 0 0;
+}
+
+.settings-title {
+    margin: 0;
+    font-size: 24px;
+    letter-spacing: 1px;
+    color: var(--main-brown);
+}
+
+.settings-close-btn {
+    background: rgba(255, 255, 255, 0.6);
+    border: 2px solid var(--main-brown);
+    color: var(--main-brown);
+    font-size: 14px;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.settings-close-btn:hover {
+    background: var(--main-brown);
+    color: var(--text-on-brown);
+    transform: scale(1.05);
+}
+
+.settings-body {
+    padding: 10px 20px;
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
+}
+
+.settings-row-text {
+    flex: 1;
+}
+
+.settings-label {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    color: var(--main-brown);
+}
+
+.settings-hint {
+    margin: 0;
+    font-size: 12px;
+    color: rgba(73, 22, 8, 0.6);
+    line-height: 1.4;
+}
+
+.settings-divider {
+    height: 0;
+    border-top: 2px dashed rgba(73, 22, 8, 0.2);
+}
+
+.settings-btn {
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.6);
+    border: 2px solid var(--main-brown);
+    color: var(--main-brown);
+    font-family: var(--pixel-font);
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.settings-btn:hover {
+    background: var(--main-brown);
+    color: var(--text-on-brown);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 0px rgba(73, 22, 8, 0.3);
+}
+
+.settings-btn-danger {
+    border-color: #d64545;
+    color: #d64545;
+}
+
+.settings-btn-danger:hover {
+    background: #d64545;
+    color: var(--text-on-brown);
+}
+
+.settings-footer {
+    padding: 14px 20px;
+    border-top: 3px dashed var(--main-brown);
+    text-align: center;
+}
+
+.settings-version {
+    margin: 0;
+    font-size: 12px;
+    color: rgba(73, 22, 8, 0.5);
+    letter-spacing: 1px;
+}
+
+/* --- ПЕРЕКЛЮЧАТЕЛЬ (TOGGLE) --- */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 2px solid var(--main-brown);
+    border-radius: 999px;
+    transition: all 0.2s ease;
+    box-shadow: inset 1px 1px 3px rgba(73, 22, 8, 0.15);
+}
+
+.toggle-slider::before {
+    content: "";
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    top: 3px;
+    background-color: var(--main-brown);
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: rgba(73, 22, 8, 0.15);
+    border-color: var(--main-brown);
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(20px);
+}
+
+/* --- ОКНО ПОДТВЕРЖДЕНИЯ (замена нативного confirm/alert) --- */
+.confirm-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(73, 22, 8, 0.4);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirm-overlay.open {
+    display: flex;
+}
+
+.confirm-modal {
+    width: 380px;
+    max-width: 85vw;
+    background-color: var(--bg-color);
+    border: 3px solid var(--main-brown);
+    border-radius: 12px;
+    box-shadow: 6px 6px 0px rgba(73, 22, 8, 0.2), 0 10px 30px rgba(0, 0, 0, 0.25);
+    font-family: var(--pixel-font);
+    color: var(--main-brown);
+    padding: 22px;
+    animation: messageAppear 0.2s ease-out;
+}
+
+.confirm-message {
+    margin: 0 0 20px 0;
+    font-size: 16px;
+    line-height: 1.5;
+    text-align: center;
+    color: var(--main-brown);
+}
+
+.confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.confirm-actions .settings-btn {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+}

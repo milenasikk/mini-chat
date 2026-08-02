@@ -547,6 +547,19 @@ const historyList = document.getElementById('history-list');
 const newChatBtn = document.getElementById('new-chat-btn');
 const searchInput = document.getElementById('search-input');
 
+const settingsLink = document.getElementById('settings-link');
+const settingsOverlay = document.getElementById('settings-overlay');
+const settingsCloseBtn = document.getElementById('settings-close-btn');
+const effectsToggle = document.getElementById('effects-toggle');
+const exportBtn = document.getElementById('export-btn');
+const clearHistoryBtn = document.getElementById('clear-history-btn');
+const resetSettingsBtn = document.getElementById('reset-settings-btn');
+
+const confirmOverlay = document.getElementById('confirm-overlay');
+const confirmMessage = document.getElementById('confirm-message');
+const confirmOkBtn = document.getElementById('confirm-ok-btn');
+const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+
 const style = document.createElement('style');
 style.innerHTML = `
     .text-input.input-error::placeholder {
@@ -562,7 +575,184 @@ document.head.appendChild(style);
 let chats = JSON.parse(localStorage.getItem('minichat_history')) || [];
 let activeChatId = null;
 
+const defaultSettings = {
+    effectsEnabled: true
+};
+
+let settings = { ...defaultSettings, ...(JSON.parse(localStorage.getItem('minichat_settings')) || {}) };
+
 init();
+initSettings();
+
+function saveSettingsToLocalStorage() {
+    localStorage.setItem('minichat_settings', JSON.stringify(settings));
+}
+
+function applySettings() {
+    document.body.classList.toggle('effects-disabled', !settings.effectsEnabled);
+    if (effectsToggle) effectsToggle.checked = settings.effectsEnabled;
+}
+
+function initSettings() {
+    applySettings();
+
+    if (settingsLink) {
+        settingsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            openSettings();
+        });
+    }
+
+    if (settingsCloseBtn) {
+        settingsCloseBtn.addEventListener('click', closeSettings);
+    }
+
+    if (settingsOverlay) {
+        settingsOverlay.addEventListener('click', (e) => {
+            if (e.target === settingsOverlay) closeSettings();
+        });
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && settingsOverlay && settingsOverlay.classList.contains('open')) {
+            closeSettings();
+        }
+    });
+
+    if (effectsToggle) {
+        effectsToggle.addEventListener('change', () => {
+            settings.effectsEnabled = effectsToggle.checked;
+            saveSettingsToLocalStorage();
+            applySettings();
+        });
+    }
+
+    if (exportBtn) {
+        exportBtn.addEventListener('click', exportChatsToTxt);
+    }
+
+    if (clearHistoryBtn) {
+        clearHistoryBtn.addEventListener('click', clearAllChats);
+    }
+
+    if (resetSettingsBtn) {
+        resetSettingsBtn.addEventListener('click', resetAllSettings);
+    }
+}
+
+function openSettings() {
+    if (settingsOverlay) settingsOverlay.classList.add('open');
+}
+
+function closeSettings() {
+    if (settingsOverlay) settingsOverlay.classList.remove('open');
+}
+
+let pendingConfirmCallback = null;
+
+function showConfirmDialog(message, onConfirm) {
+    if (!confirmOverlay) {
+        onConfirm();
+        return;
+    }
+    confirmMessage.innerText = message;
+    if (confirmCancelBtn) confirmCancelBtn.style.display = '';
+    if (confirmOkBtn) confirmOkBtn.innerText = 'Confirm';
+    pendingConfirmCallback = onConfirm;
+    confirmOverlay.classList.add('open');
+}
+
+function showInfoDialog(message) {
+    if (!confirmOverlay) {
+        return;
+    }
+    confirmMessage.innerText = message;
+    if (confirmCancelBtn) confirmCancelBtn.style.display = 'none';
+    if (confirmOkBtn) confirmOkBtn.innerText = 'OK';
+    pendingConfirmCallback = null;
+    confirmOverlay.classList.add('open');
+}
+
+function closeConfirmDialog() {
+    if (confirmOverlay) confirmOverlay.classList.remove('open');
+    if (confirmCancelBtn) confirmCancelBtn.style.display = '';
+    if (confirmOkBtn) confirmOkBtn.innerText = 'Confirm';
+    pendingConfirmCallback = null;
+}
+
+if (confirmOkBtn) {
+    confirmOkBtn.addEventListener('click', () => {
+        const callback = pendingConfirmCallback;
+        closeConfirmDialog();
+        if (callback) callback();
+    });
+}
+
+if (confirmCancelBtn) {
+    confirmCancelBtn.addEventListener('click', closeConfirmDialog);
+}
+
+if (confirmOverlay) {
+    confirmOverlay.addEventListener('click', (e) => {
+        if (e.target === confirmOverlay) closeConfirmDialog();
+    });
+}
+
+function stripHtmlToText(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent.replace(/\n{3,}/g, '\n\n').trim();
+}
+
+function exportChatsToTxt() {
+    if (chats.length === 0) {
+        showInfoDialog('No chats to export.');
+        return;
+    }
+    let output = `Mini Chat — Export\nDate: ${new Date().toLocaleString()}\n`;
+    output += '='.repeat(50) + '\n\n';
+
+    chats.forEach((chat, i) => {
+        output += `Chat ${i + 1}: ${chat.title}\n`;
+        output += '-'.repeat(50) + '\n';
+
+        chat.messages.forEach(msg => {
+            const sender = msg.className === 'user-message' ? 'You' : 'Bot';
+            const cleanText = stripHtmlToText(msg.text);
+            output += `[${sender}]: ${cleanText}\n\n`;
+        });
+
+        output += '\n';
+    });
+
+    const blob = new Blob([output], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `minichat-export-${Date.now()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+}
+
+function clearAllChats() {
+    showConfirmDialog('Delete all chats? This action cannot be undone.', () => {
+        chats = [];
+        activeChatId = null;
+        localStorage.removeItem('minichat_history');
+        createNewChat();
+        closeSettings();
+    });
+}
+
+function resetAllSettings() {
+    showConfirmDialog('Reset all settings to their default values?', () => {
+        settings = { ...defaultSettings };
+        saveSettingsToLocalStorage();
+        applySettings();
+    });
+}
 
 function init() {
     if (chats.length > 0) {
