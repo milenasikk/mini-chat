@@ -34,18 +34,18 @@
 
     <div class="home">
         <p class="title">Mini Chat</p>
+        <p class="chat-stats" id="chat-stats"></p>
 
         <div class="chat-container" id="chat-container">
         </div>
+
+        <button class="scroll-bottom-btn" id="scroll-bottom-btn" title="Scroll to latest">↓</button>
 
         <div class="input-container">
             <input type="text" class="text-input" id="user-input" placeholder="Enter your question...">
             <button class="send-btn" id="send-btn">➔</button>
         </div>
 
-        <div class="icon">
-            <img src="assets/chat.png" class="logo">
-        </div>
     </div>
     
     <div class="settings-overlay" id="settings-overlay">
@@ -56,6 +56,49 @@
             </div>
 
             <div class="settings-body">
+                <div class="settings-row">
+                    <div class="settings-row-text">
+                        <p class="settings-label">Dark Theme</p>
+                        <p class="settings-hint">Switch between light and dark appearance</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="settings-divider"></div>
+
+                <div class="settings-row">
+                    <div class="settings-row-text">
+                        <p class="settings-label">Theme Color</p>
+                        <p class="settings-hint">Pick an accent color for the app</p>
+                    </div>
+                    <div class="accent-swatches" id="accent-swatches">
+                        <button class="accent-swatch" data-accent="brown" style="--swatch-color: rgb(73, 22, 8);" title="Brown"></button>
+                        <button class="accent-swatch" data-accent="blue" style="--swatch-color: rgb(20, 60, 110);" title="Blue"></button>
+                        <button class="accent-swatch" data-accent="green" style="--swatch-color: rgb(24, 74, 44);" title="Green"></button>
+                        <button class="accent-swatch" data-accent="purple" style="--swatch-color: rgb(66, 25, 90);" title="Purple"></button>
+                        <button class="accent-swatch" data-accent="red" style="--swatch-color: rgb(110, 26, 26);" title="Red"></button>
+                    </div>
+                </div>
+
+                <div class="settings-divider"></div>
+
+                <div class="settings-row">
+                    <div class="settings-row-text">
+                        <p class="settings-label">Font Size</p>
+                        <p class="settings-hint">Adjust the message text size</p>
+                    </div>
+                    <div class="font-size-switch" id="font-size-switch">
+                        <button class="font-size-btn" data-size="small" title="Small">A</button>
+                        <button class="font-size-btn" data-size="medium" title="Medium">A</button>
+                        <button class="font-size-btn" data-size="large" title="Large">A</button>
+                    </div>
+                </div>
+
+                <div class="settings-divider"></div>
+
                 <div class="settings-row">
                     <div class="settings-row-text">
                         <p class="settings-label">Animations</p>
@@ -72,9 +115,23 @@
                 <div class="settings-row">
                     <div class="settings-row-text">
                         <p class="settings-label">Export Chats</p>
-                        <p class="settings-hint">Download all chats as a .txt file</p>
+                        <p class="settings-hint">Download all chats as a file</p>
                     </div>
-                    <button class="settings-btn" id="export-btn">Export .txt</button>
+                    <div class="settings-btn-group">
+                        <button class="settings-btn" id="export-txt-btn">.txt</button>
+                        <button class="settings-btn" id="export-json-btn">.json</button>
+                    </div>
+                </div>
+
+                <div class="settings-divider"></div>
+
+                <div class="settings-row">
+                    <div class="settings-row-text">
+                        <p class="settings-label">Import Chats</p>
+                        <p class="settings-hint">Restore chats from a previously exported .json file</p>
+                    </div>
+                    <button class="settings-btn" id="import-btn">Import .json</button>
+                    <input type="file" id="import-file-input" accept="application/json,.json" style="display:none;">
                 </div>
 
                 <div class="settings-divider"></div>

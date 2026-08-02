@@ -4,6 +4,7 @@
     --text-on-brown: rgb(247, 247, 255);
     --accent-light: rgba(73, 22, 8, 0.1);
     --pixel-font: "Pixelify Sans", sans-serif;
+    --chat-font-size: 16px;
 }
 
 body {
@@ -138,6 +139,27 @@ body {
     text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5);
 }
 
+.date-group-title {
+    margin: 12px 0 8px 0;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(247, 247, 255, 0.15);
+}
+
+.date-group-title:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+}
+
+.chat-item[draggable="true"] {
+    cursor: grab;
+}
+
+.chat-item.drag-over {
+    border-color: rgba(255, 212, 92, 0.8) !important;
+    box-shadow: 0 0 0 2px rgba(255, 212, 92, 0.4);
+}
+
 .history-menu {
     list-style: none;
     padding: 0;
@@ -230,6 +252,18 @@ body {
     color: #ffdd55;
 }
 
+.pin-btn.active {
+    color: #ffd45c;
+}
+
+.pin-btn:hover {
+    color: #ffd45c;
+}
+
+.duplicate-btn:hover {
+    color: #7fd6ff;
+}
+
 .new-chat-btn {
     width: 100%;
     height: 48px;
@@ -286,14 +320,6 @@ body {
     letter-spacing: -1px;
 }
 
-.logo {
-    position: absolute;
-    width: 55px;
-    left: 30px; 
-    top: 15px;
-    animation: logoPulse 3s infinite ease-in-out;
-}
-
 .chat-container {
     width: 90%;
     max-width: 1200px;
@@ -329,7 +355,7 @@ body {
 .message {
     max-width: 85%;
     padding: 10px 18px;
-    font-size: 16px;
+    font-size: var(--chat-font-size, 16px);
     line-height: 1.4;
     word-wrap: break-word;
     animation: messageAppear 0.4s ease-out;
@@ -712,6 +738,245 @@ body.effects-disabled .logo {
 
 .toggle-switch input:checked + .toggle-slider::before {
     transform: translateX(20px);
+}
+
+/* --- СЧЁТЧИК СООБЩЕНИЙ --- */
+.chat-stats {
+    font-family: var(--pixel-font);
+    font-size: 12px;
+    color: rgba(73, 22, 8, 0.55);
+    margin: 2px 0 8px 0;
+    text-align: center;
+}
+
+/* --- КНОПКА "ВНИЗ" --- */
+.scroll-bottom-btn {
+    position: absolute;
+    bottom: 76px;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    background: var(--main-brown);
+    color: var(--text-on-brown);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 5;
+}
+
+.scroll-bottom-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+.scroll-bottom-btn:hover {
+    background-color: rgb(110, 33, 12);
+}
+
+/* --- ИНДИКАТОР НАБОРА ТЕКСТА (ТОЧКИ) --- */
+.typing-dots {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 2px;
+}
+
+.typing-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--main-brown);
+    opacity: 0.35;
+    animation: typingBounce 1.2s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.35; }
+    40% { transform: translateY(-6px); opacity: 1; }
+}
+
+body.effects-disabled .typing-dots span {
+    animation: none;
+    opacity: 0.7;
+}
+
+/* --- КНОПКА STOP/SKIP ВО ВРЕМЯ ОТВЕТА --- */
+.send-btn.stop-mode {
+    background-color: #a33333;
+}
+
+.send-btn.stop-mode:hover {
+    background-color: #c44444;
+}
+
+/* --- ЦВЕТОВЫЕ СВОТЧИ ТЕМЫ --- */
+.accent-swatches {
+    display: flex;
+    gap: 8px;
+}
+
+.accent-swatch {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--swatch-color);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+
+.accent-swatch:hover {
+    transform: scale(1.15);
+}
+
+.accent-swatch.active {
+    border-color: var(--text-on-brown);
+    box-shadow: 0 0 0 2px var(--swatch-color);
+    transform: scale(1.1);
+}
+
+/* --- ПЕРЕКЛЮЧАТЕЛЬ РАЗМЕРА ШРИФТА --- */
+.font-size-switch {
+    display: flex;
+    gap: 4px;
+}
+
+.font-size-btn {
+    background: rgba(255, 255, 255, 0.6);
+    border: 2px solid var(--main-brown);
+    color: var(--main-brown);
+    font-family: var(--pixel-font);
+    cursor: pointer;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    transition: all 0.15s ease;
+}
+
+.font-size-btn[data-size="small"] { font-size: 11px; }
+.font-size-btn[data-size="medium"] { font-size: 15px; }
+.font-size-btn[data-size="large"] { font-size: 19px; }
+
+.font-size-btn:hover {
+    background: var(--main-brown);
+    color: var(--text-on-brown);
+}
+
+.font-size-btn.active {
+    background: var(--main-brown);
+    color: var(--text-on-brown);
+    box-shadow: 0 2px 0px rgba(73, 22, 8, 0.3);
+}
+
+.settings-btn-group {
+    display: flex;
+    gap: 8px;
+}
+
+/* --- ТЁМНАЯ ТЕМА --- */
+body.theme-dark {
+    --bg-color: rgb(24, 22, 28);
+}
+
+body.theme-dark .bg-overlay {
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+body.theme-dark .title,
+body.theme-dark .chat-stats {
+    color: rgb(230, 226, 235);
+}
+
+body.theme-dark .title {
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4);
+}
+
+body.theme-dark .bot-message {
+    background-color: rgba(255, 255, 255, 0.06);
+    color: rgb(230, 226, 235);
+    box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
+}
+
+body.theme-dark .text-input {
+    background: rgba(255, 255, 255, 0.06);
+    color: rgb(230, 226, 235);
+}
+
+body.theme-dark .text-input::placeholder {
+    color: rgba(230, 226, 235, 0.4);
+}
+
+body.theme-dark .text-input:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.theme-dark .text-input:disabled {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+body.theme-dark .topic-chip {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: rgb(230, 226, 235);
+}
+
+body.theme-dark .chat-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.theme-dark .settings-modal,
+body.theme-dark .confirm-modal {
+    background-color: rgb(30, 28, 34);
+    color: rgb(230, 226, 235);
+}
+
+body.theme-dark .settings-header {
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+body.theme-dark .settings-label,
+body.theme-dark .settings-title,
+body.theme-dark .confirm-message {
+    color: rgb(230, 226, 235);
+}
+
+body.theme-dark .settings-hint,
+body.theme-dark .settings-version {
+    color: rgba(230, 226, 235, 0.55);
+}
+
+body.theme-dark .settings-close-btn,
+body.theme-dark .settings-btn,
+body.theme-dark .font-size-btn {
+    background: rgba(255, 255, 255, 0.06);
+    color: rgb(230, 226, 235);
+}
+
+body.theme-dark .toggle-slider {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+body.theme-dark .toggle-slider::before {
+    background-color: rgb(230, 226, 235);
+}
+
+body.theme-dark .typing-dots span {
+    background: rgb(230, 226, 235);
 }
 
 /* --- ОКНО ПОДТВЕРЖДЕНИЯ (замена нативного confirm/alert) --- */

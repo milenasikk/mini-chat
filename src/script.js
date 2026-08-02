@@ -551,9 +551,17 @@ const settingsLink = document.getElementById('settings-link');
 const settingsOverlay = document.getElementById('settings-overlay');
 const settingsCloseBtn = document.getElementById('settings-close-btn');
 const effectsToggle = document.getElementById('effects-toggle');
-const exportBtn = document.getElementById('export-btn');
+const themeToggle = document.getElementById('theme-toggle');
+const accentSwatches = document.getElementById('accent-swatches');
+const fontSizeSwitch = document.getElementById('font-size-switch');
+const exportTxtBtn = document.getElementById('export-txt-btn');
+const exportJsonBtn = document.getElementById('export-json-btn');
+const importBtn = document.getElementById('import-btn');
+const importFileInput = document.getElementById('import-file-input');
 const clearHistoryBtn = document.getElementById('clear-history-btn');
 const resetSettingsBtn = document.getElementById('reset-settings-btn');
+const chatStats = document.getElementById('chat-stats');
+const scrollBottomBtn = document.getElementById('scroll-bottom-btn');
 
 const confirmOverlay = document.getElementById('confirm-overlay');
 const confirmMessage = document.getElementById('confirm-message');
@@ -572,14 +580,36 @@ style.innerHTML = `
 `;
 document.head.appendChild(style);
 
-let chats = JSON.parse(localStorage.getItem('minichat_history')) || [];
+let chats = (JSON.parse(localStorage.getItem('minichat_history')) || []).map(c => ({
+    pinned: false,
+    updatedAt: c.id,
+    draft: '',
+    ...c
+}));
 let activeChatId = null;
 
 const defaultSettings = {
-    effectsEnabled: true
+    effectsEnabled: true,
+    theme: 'light',
+    accentColor: 'brown',
+    fontSize: 'medium'
 };
 
 let settings = { ...defaultSettings, ...(JSON.parse(localStorage.getItem('minichat_settings')) || {}) };
+
+const accentPalette = {
+    brown: { main: 'rgb(73, 22, 8)', light: 'rgba(73, 22, 8, 0.1)' },
+    blue: { main: 'rgb(20, 60, 110)', light: 'rgba(20, 60, 110, 0.1)' },
+    green: { main: 'rgb(24, 74, 44)', light: 'rgba(24, 74, 44, 0.1)' },
+    purple: { main: 'rgb(66, 25, 90)', light: 'rgba(66, 25, 90, 0.1)' },
+    red: { main: 'rgb(110, 26, 26)', light: 'rgba(110, 26, 26, 0.1)' }
+};
+
+const fontSizeMap = {
+    small: '14px',
+    medium: '16px',
+    large: '19px'
+};
 
 init();
 initSettings();
@@ -590,7 +620,28 @@ function saveSettingsToLocalStorage() {
 
 function applySettings() {
     document.body.classList.toggle('effects-disabled', !settings.effectsEnabled);
+    document.body.classList.toggle('theme-dark', settings.theme === 'dark');
+
+    const palette = accentPalette[settings.accentColor] || accentPalette.brown;
+    document.documentElement.style.setProperty('--main-brown', palette.main);
+    document.documentElement.style.setProperty('--accent-light', palette.light);
+
+    document.documentElement.style.setProperty('--chat-font-size', fontSizeMap[settings.fontSize] || fontSizeMap.medium);
+
     if (effectsToggle) effectsToggle.checked = settings.effectsEnabled;
+    if (themeToggle) themeToggle.checked = settings.theme === 'dark';
+
+    if (accentSwatches) {
+        accentSwatches.querySelectorAll('.accent-swatch').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-accent') === settings.accentColor);
+        });
+    }
+
+    if (fontSizeSwitch) {
+        fontSizeSwitch.querySelectorAll('.font-size-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-size') === settings.fontSize);
+        });
+    }
 }
 
 function initSettings() {
@@ -627,8 +678,45 @@ function initSettings() {
         });
     }
 
-    if (exportBtn) {
-        exportBtn.addEventListener('click', exportChatsToTxt);
+    if (themeToggle) {
+        themeToggle.addEventListener('change', () => {
+            settings.theme = themeToggle.checked ? 'dark' : 'light';
+            saveSettingsToLocalStorage();
+            applySettings();
+        });
+    }
+
+    if (accentSwatches) {
+        accentSwatches.addEventListener('click', (e) => {
+            const btn = e.target.closest('.accent-swatch');
+            if (!btn) return;
+            settings.accentColor = btn.getAttribute('data-accent');
+            saveSettingsToLocalStorage();
+            applySettings();
+        });
+    }
+
+    if (fontSizeSwitch) {
+        fontSizeSwitch.addEventListener('click', (e) => {
+            const btn = e.target.closest('.font-size-btn');
+            if (!btn) return;
+            settings.fontSize = btn.getAttribute('data-size');
+            saveSettingsToLocalStorage();
+            applySettings();
+        });
+    }
+
+    if (exportTxtBtn) {
+        exportTxtBtn.addEventListener('click', exportChatsToTxt);
+    }
+
+    if (exportJsonBtn) {
+        exportJsonBtn.addEventListener('click', exportChatsToJson);
+    }
+
+    if (importBtn && importFileInput) {
+        importBtn.addEventListener('click', () => importFileInput.click());
+        importFileInput.addEventListener('change', handleImportFile);
     }
 
     if (clearHistoryBtn) {
@@ -736,6 +824,71 @@ function exportChatsToTxt() {
     URL.revokeObjectURL(url);
 }
 
+function exportChatsToJson() {
+    if (chats.length === 0) {
+        showInfoDialog('No chats to export.');
+        return;
+    }
+
+    const payload = {
+        app: 'minichat',
+        exportedAt: new Date().toISOString(),
+        chats
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `minichat-export-${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+}
+
+function handleImportFile(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+        try {
+            const parsed = JSON.parse(reader.result);
+            const importedChats = Array.isArray(parsed) ? parsed : parsed.chats;
+
+            if (!Array.isArray(importedChats) || importedChats.length === 0) {
+                throw new Error('Invalid format');
+            }
+
+            const normalized = importedChats
+                .filter(c => c && typeof c.title === 'string' && Array.isArray(c.messages))
+                .map((c, i) => ({
+                    id: Date.now() + i,
+                    title: c.title,
+                    messages: c.messages,
+                    pinned: false,
+                    updatedAt: Date.now(),
+                    draft: ''
+                }));
+
+            if (normalized.length === 0) {
+                throw new Error('Invalid format');
+            }
+
+            chats = [...normalized, ...chats];
+            saveToLocalStorage();
+            renderSidebar();
+            showInfoDialog(`Imported ${normalized.length} chat(s) successfully.`);
+        } catch (err) {
+            showInfoDialog('Could not import this file. Make sure it is a valid Mini Chat .json export.');
+        } finally {
+            importFileInput.value = '';
+        }
+    };
+    reader.readAsText(file);
+}
+
 function clearAllChats() {
     showConfirmDialog('Delete all chats? This action cannot be undone.', () => {
         chats = [];
@@ -774,7 +927,10 @@ function createNewChat() {
         title: "New Chat",
         messages: [
             { text: initialBotGreeting, className: 'bot-message' }
-        ]
+        ],
+        pinned: false,
+        updatedAt: Date.now(),
+        draft: ''
     };
 
     chats.unshift(newChat);
@@ -782,6 +938,47 @@ function createNewChat() {
     saveToLocalStorage();
     renderSidebar();
     loadActiveChat();
+}
+
+function duplicateChat(chatId) {
+    const source = chats.find(c => c.id === chatId);
+    if (!source) return;
+
+    const clone = {
+        ...JSON.parse(JSON.stringify(source)),
+        id: Date.now(),
+        title: `${source.title} (copy)`,
+        pinned: false,
+        updatedAt: Date.now(),
+        draft: ''
+    };
+
+    chats.unshift(clone);
+    activeChatId = clone.id;
+    saveToLocalStorage();
+    renderSidebar();
+    loadActiveChat();
+}
+
+function toggleChatPin(chatId) {
+    const chat = chats.find(c => c.id === chatId);
+    if (!chat) return;
+    chat.pinned = !chat.pinned;
+    saveToLocalStorage();
+    renderSidebar();
+}
+
+function getDateBucketLabel(timestamp) {
+    const date = new Date(timestamp);
+    const now = new Date();
+
+    const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    const dayDiff = Math.round((startOfDay(now) - startOfDay(date)) / 86400000);
+
+    if (dayDiff <= 0) return 'Today';
+    if (dayDiff === 1) return 'Yesterday';
+    if (dayDiff <= 7) return 'Previous 7 Days';
+    return 'Older';
 }
 
 function deleteChat(chatId) {
@@ -853,69 +1050,186 @@ function renameChat(chatId) {
     });
 }
 
+let draggedChatId = null;
+
+function createGroupHeader(text) {
+    const li = document.createElement('li');
+    li.classList.add('group-header');
+    const p = document.createElement('p');
+    p.classList.add('sidebar-section-title', 'date-group-title');
+    p.innerText = text;
+    li.appendChild(p);
+    return li;
+}
+
+function createChatItemElement(chat) {
+    const li = document.createElement('li');
+
+    const chatItemDiv = document.createElement('div');
+    chatItemDiv.classList.add('chat-item');
+    chatItemDiv.setAttribute('data-id', chat.id);
+    if (chat.id === activeChatId) chatItemDiv.classList.add('active');
+
+    if (chat.pinned) {
+        chatItemDiv.draggable = true;
+        chatItemDiv.addEventListener('dragstart', (e) => {
+            draggedChatId = chat.id;
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        chatItemDiv.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            chatItemDiv.classList.add('drag-over');
+        });
+        chatItemDiv.addEventListener('dragleave', () => {
+            chatItemDiv.classList.remove('drag-over');
+        });
+        chatItemDiv.addEventListener('drop', (e) => {
+            e.preventDefault();
+            chatItemDiv.classList.remove('drag-over');
+            if (draggedChatId !== null && draggedChatId !== chat.id) {
+                movePinnedChat(draggedChatId, chat.id);
+            }
+            draggedChatId = null;
+        });
+    }
+
+    const titleSpan = document.createElement('span');
+    titleSpan.classList.add('chat-title-text');
+    titleSpan.innerText = chat.title;
+
+    const actionsDiv = document.createElement('div');
+    actionsDiv.classList.add('chat-actions');
+
+    const pinBtn = document.createElement('button');
+    pinBtn.classList.add('action-btn', 'pin-btn');
+    if (chat.pinned) pinBtn.classList.add('active');
+    pinBtn.innerHTML = chat.pinned ? '★' : '☆';
+    pinBtn.title = chat.pinned ? 'Unpin chat' : 'Pin chat';
+
+    pinBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleChatPin(chat.id);
+    });
+
+    const duplicateBtn = document.createElement('button');
+    duplicateBtn.classList.add('action-btn', 'duplicate-btn');
+    duplicateBtn.innerHTML = '⧉';
+    duplicateBtn.title = 'Duplicate chat';
+
+    duplicateBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        duplicateChat(chat.id);
+    });
+
+    const editBtn = document.createElement('button');
+    editBtn.classList.add('action-btn', 'edit-btn');
+    editBtn.innerHTML = '✏️';
+    editBtn.title = 'Rename chat';
+
+    editBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        renameChat(chat.id);
+    });
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.classList.add('action-btn', 'delete-btn');
+    deleteBtn.innerHTML = '✖';
+    deleteBtn.title = 'Delete chat';
+
+    deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteChat(chat.id);
+    });
+
+    chatItemDiv.addEventListener('click', () => {
+        if (activeChatId === chat.id) return;
+        saveDraftForActiveChat();
+        activeChatId = chat.id;
+        renderSidebar();
+        loadActiveChat();
+    });
+
+    actionsDiv.appendChild(pinBtn);
+    actionsDiv.appendChild(duplicateBtn);
+    actionsDiv.appendChild(editBtn);
+    actionsDiv.appendChild(deleteBtn);
+
+    chatItemDiv.appendChild(titleSpan);
+    chatItemDiv.appendChild(actionsDiv);
+    li.appendChild(chatItemDiv);
+    return li;
+}
+
+function movePinnedChat(draggedId, targetId) {
+    const draggedIndex = chats.findIndex(c => c.id === draggedId);
+    const targetIndex = chats.findIndex(c => c.id === targetId);
+    if (draggedIndex === -1 || targetIndex === -1) return;
+
+    const [item] = chats.splice(draggedIndex, 1);
+    chats.splice(targetIndex, 0, item);
+    saveToLocalStorage();
+    renderSidebar();
+}
+
 function renderSidebar() {
     historyList.innerHTML = '';
     const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
-    
-    const filteredChats = chats.filter(chat => 
+
+    const filteredChats = chats.filter(chat =>
         chat.title.toLowerCase().includes(query) ||
         chat.messages.some(m => m.text.toLowerCase().includes(query))
     );
 
-    filteredChats.forEach(chat => {
-        const li = document.createElement('li');
-        
-        const chatItemDiv = document.createElement('div');
-        chatItemDiv.classList.add('chat-item');
-        chatItemDiv.setAttribute('data-id', chat.id);
-        if (chat.id === activeChatId) chatItemDiv.classList.add('active');
+    const pinnedChats = filteredChats.filter(c => c.pinned);
+    const unpinnedChats = filteredChats.filter(c => !c.pinned);
 
-        const titleSpan = document.createElement('span');
-        titleSpan.classList.add('chat-title-text');
-        titleSpan.innerText = chat.title;
-
-        const actionsDiv = document.createElement('div');
-        actionsDiv.classList.add('chat-actions');
-
-        const editBtn = document.createElement('button');
-        editBtn.classList.add('action-btn', 'edit-btn');
-        editBtn.innerHTML = '✏️';
-        editBtn.title = 'Rename chat';
-
-        editBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            renameChat(chat.id);
+    if (pinnedChats.length > 0) {
+        historyList.appendChild(createGroupHeader('📌 Pinned'));
+        pinnedChats.forEach(chat => {
+            historyList.appendChild(createChatItemElement(chat));
         });
+    }
 
-        const deleteBtn = document.createElement('button');
-        deleteBtn.classList.add('action-btn', 'delete-btn');
-        deleteBtn.innerHTML = '✖';
-        deleteBtn.title = 'Delete chat';
+    const bucketOrder = ['Today', 'Yesterday', 'Previous 7 Days', 'Older'];
+    const buckets = {};
+    unpinnedChats.forEach(chat => {
+        const label = getDateBucketLabel(chat.updatedAt || chat.id);
+        if (!buckets[label]) buckets[label] = [];
+        buckets[label].push(chat);
+    });
 
-        deleteBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            deleteChat(chat.id);
+    bucketOrder.forEach(label => {
+        if (!buckets[label] || buckets[label].length === 0) return;
+        historyList.appendChild(createGroupHeader(label));
+        buckets[label].forEach(chat => {
+            historyList.appendChild(createChatItemElement(chat));
         });
-
-        chatItemDiv.addEventListener('click', () => {
-            if (activeChatId === chat.id) return;
-            activeChatId = chat.id;
-            renderSidebar();
-            loadActiveChat();
-        });
-
-        actionsDiv.appendChild(editBtn);
-        actionsDiv.appendChild(deleteBtn);
-
-        chatItemDiv.appendChild(titleSpan);
-        chatItemDiv.appendChild(actionsDiv);
-        li.appendChild(chatItemDiv);
-        historyList.appendChild(li);
     });
 }
 
 if (searchInput) {
     searchInput.addEventListener('input', renderSidebar);
+}
+
+function saveDraftForActiveChat() {
+    const activeChat = chats.find(c => c.id === activeChatId);
+    if (activeChat) {
+        activeChat.draft = userInput.value;
+        saveToLocalStorage();
+    }
+}
+
+function updateChatStats() {
+    if (!chatStats) return;
+    const activeChat = chats.find(c => c.id === activeChatId);
+    if (!activeChat) {
+        chatStats.innerText = '';
+        return;
+    }
+
+    const messageCount = activeChat.messages.length;
+    const charCount = activeChat.messages.reduce((sum, m) => sum + stripHtmlToText(m.text).length, 0);
+    chatStats.innerText = `${messageCount} messages · ${charCount.toLocaleString()} characters`;
 }
 
 function loadActiveChat() {
@@ -926,23 +1240,64 @@ function loadActiveChat() {
     activeChat.messages.forEach(msg => {
         appendMessageToDOM(msg.text, msg.className);
     });
+
+    userInput.value = activeChat.draft || '';
+    updateChatStats();
+    updateScrollButtonVisibility();
 }
 
 newChatBtn.addEventListener('click', createNewChat);
 
-sendBtn.addEventListener('click', handleSend);
+sendBtn.addEventListener('click', () => {
+    if (isGenerating) {
+        skipGeneration();
+    } else {
+        handleSend();
+    }
+});
+
 userInput.addEventListener('keydown', (e) => {
     if (userInput.classList.contains('input-error')) {
         userInput.classList.remove('input-error');
     }
     if (e.key === 'Enter' && !userInput.disabled) handleSend();
+
+    if (e.key === 'ArrowUp' && userInput.value === '') {
+        const activeChat = chats.find(c => c.id === activeChatId);
+        if (activeChat) {
+            const userMessages = activeChat.messages.filter(m => m.className === 'user-message');
+            if (userMessages.length > 0) {
+                e.preventDefault();
+                const lastText = userMessages[userMessages.length - 1].text;
+                userInput.value = lastText;
+                requestAnimationFrame(() => {
+                    userInput.setSelectionRange(lastText.length, lastText.length);
+                });
+            }
+        }
+    }
 });
 
 userInput.addEventListener('input', () => {
     if (userInput.classList.contains('input-error')) {
         userInput.classList.remove('input-error');
     }
+    saveDraftForActiveChat();
 });
+
+function updateScrollButtonVisibility() {
+    if (!scrollBottomBtn) return;
+    const distanceFromBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight;
+    scrollBottomBtn.classList.toggle('visible', distanceFromBottom > 120);
+}
+
+if (scrollBottomBtn) {
+    scrollBottomBtn.addEventListener('click', () => {
+        chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+    });
+}
+
+chatContainer.addEventListener('scroll', updateScrollButtonVisibility);
 
 chatContainer.addEventListener('click', (e) => {
     if (e.target.classList.contains('topic-chip')) {
@@ -962,19 +1317,22 @@ function handleSend() {
 
     userInput.classList.remove('input-error');
     userInput.value = '';
+    saveDraftForActiveChat();
     processUserMessage(text);
 }
 
 function processUserMessage(text, topicKey = null) {
     const activeChat = chats.find(c => c.id === activeChatId);
-    
+
     if (activeChat.title === "New Chat") {
         activeChat.title = text;
         renderSidebar();
     }
 
     activeChat.messages.push({ text: text, className: 'user-message' });
+    activeChat.updatedAt = Date.now();
     appendMessageToDOM(text, 'user-message');
+    updateChatStats();
     saveToLocalStorage();
 
     showTypingIndicator(topicKey);
@@ -1021,25 +1379,59 @@ function appendMessageToDOM(text, className) {
     
     chatContainer.appendChild(messageDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
+    updateScrollButtonVisibility();
     return messageDiv;
 }
 
+function appendTypingBubble() {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', 'bot-message');
+    messageDiv.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+    chatContainer.appendChild(messageDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    return messageDiv;
+}
+
+let isGenerating = false;
+let typingState = null;
+
 function setInterfaceDisabled(status) {
     userInput.disabled = status;
-    sendBtn.disabled = status;
+    isGenerating = status;
+    sendBtn.classList.toggle('stop-mode', status);
+    sendBtn.innerText = status ? '⏭' : '➔';
+    sendBtn.title = status ? 'Skip animation' : '';
 }
 
 function showTypingIndicator(topicKey = null) {
     setInterfaceDisabled(true);
-    const tempMessage = appendMessageToDOM('Hmm, thinking...', 'bot-message');
-    
-    setTimeout(() => {
+    const tempMessage = appendTypingBubble();
+
+    const state = { cancelled: false, phase: 'thinking', tempMessage, topicKey, timeoutId: null };
+    typingState = state;
+
+    state.timeoutId = setTimeout(() => {
+        if (state.cancelled) return;
         tempMessage.remove();
-        generateBotResponse(topicKey);
+        generateBotResponse(topicKey, state);
     }, 1200);
 }
 
-function generateBotResponse(topicKey = null) {
+function skipGeneration() {
+    if (!typingState || typingState.cancelled) return;
+    const state = typingState;
+
+    if (state.phase === 'thinking') {
+        state.cancelled = true;
+        if (state.timeoutId) clearTimeout(state.timeoutId);
+        if (state.tempMessage) state.tempMessage.remove();
+        generateBotResponse(state.topicKey);
+    } else if (state.phase === 'typing') {
+        state.skipRequested = true;
+    }
+}
+
+function generateBotResponse(topicKey = null, state = null) {
     const activeChat = chats.find(c => c.id === activeChatId);
     const userMessages = activeChat.messages.filter(m => m.className === 'user-message');
     
@@ -1053,9 +1445,12 @@ function generateBotResponse(topicKey = null) {
 
     if (lastUserText === 'help') {
         activeChat.messages.push({ text: topicsChipsHTML, className: 'bot-message' });
+        activeChat.updatedAt = Date.now();
         saveToLocalStorage();
         appendMessageToDOM(topicsChipsHTML, 'bot-message');
+        updateChatStats();
         setInterfaceDisabled(false);
+        typingState = null;
         return;
     }
 
@@ -1122,18 +1517,29 @@ function generateBotResponse(topicKey = null) {
         ? jsTopics[matchedTopicKey] 
         : "Hmm, I don't know that topic yet. Try asking about: 'variables', 'functions', 'loops', 'objects', or type 'help' to see all topics.";
 
+    const activeState = state || { cancelled: false };
+    activeState.phase = 'typing';
+    activeState.skipRequested = false;
+    typingState = activeState;
+
     const botMessageElement = appendMessageToDOM('', 'bot-message');
     typeText(botMessageElement, reply, () => {
         activeChat.messages.push({ text: reply, className: 'bot-message' });
+        activeChat.updatedAt = Date.now();
         saveToLocalStorage();
-    });
+        updateChatStats();
+    }, activeState);
 }
 
-function typeText(element, text, onComplete) {
+function typeText(element, text, onComplete, state) {
     let index = 0;
     const speed = 15;
 
     function type() {
+        if (state && state.skipRequested) {
+            index = text.length;
+        }
+
         if (index < text.length) {
             element.innerText += text.charAt(index);
             index++;
@@ -1157,6 +1563,8 @@ function typeText(element, text, onComplete) {
             }
 
             setInterfaceDisabled(false);
+            typingState = null;
+            updateScrollButtonVisibility();
             if (onComplete) onComplete();
         }
     }
