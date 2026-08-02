@@ -547,6 +547,18 @@ const historyList = document.getElementById('history-list');
 const newChatBtn = document.getElementById('new-chat-btn');
 const searchInput = document.getElementById('search-input');
 
+const style = document.createElement('style');
+style.innerHTML = `
+    .text-input.input-error::placeholder {
+        color: #ff5555 !important;
+        opacity: 1 !important;
+    }
+    .text-input.input-error {
+        border-color: #ff5555 !important;
+    }
+`;
+document.head.appendChild(style);
+
 let chats = JSON.parse(localStorage.getItem('minichat_history')) || [];
 let activeChatId = null;
 
@@ -602,12 +614,53 @@ function renameChat(chatId) {
     const targetChat = chats.find(c => c.id === chatId);
     if (!targetChat) return;
 
-    const newTitle = prompt("Enter new chat title:", targetChat.title);
-    if (newTitle && newTitle.trim() !== "") {
-        targetChat.title = newTitle.trim();
-        saveToLocalStorage();
+    const currentItem = document.querySelector(`.chat-item[data-id="${chatId}"]`);
+    if (!currentItem) return;
+
+    const titleSpan = currentItem.querySelector('.chat-title-text');
+    const actionsDiv = currentItem.querySelector('.chat-actions');
+
+    if (!titleSpan) return;
+
+    const editInput = document.createElement('input');
+    editInput.type = 'text';
+    editInput.value = targetChat.title;
+    editInput.style.cssText = `
+        width: 100%;
+        background: rgba(247, 247, 255, 0.2);
+        border: 1px solid var(--text-on-brown);
+        color: inherit;
+        font-family: inherit;
+        font-size: 14px;
+        padding: 2px 4px;
+        border-radius: 4px;
+        outline: none;
+    `;
+
+    titleSpan.replaceWith(editInput);
+    if (actionsDiv) actionsDiv.style.display = 'none';
+    editInput.focus();
+
+    const saveRename = () => {
+        const newTitle = editInput.value.trim();
+        if (newTitle !== "") {
+            targetChat.title = newTitle;
+            saveToLocalStorage();
+        }
         renderSidebar();
-    }
+    };
+
+    editInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            saveRename();
+        } else if (e.key === 'Escape') {
+            renderSidebar();
+        }
+    });
+
+    editInput.addEventListener('blur', () => {
+        saveRename();
+    });
 }
 
 function renderSidebar() {
@@ -624,6 +677,7 @@ function renderSidebar() {
         
         const chatItemDiv = document.createElement('div');
         chatItemDiv.classList.add('chat-item');
+        chatItemDiv.setAttribute('data-id', chat.id);
         if (chat.id === activeChatId) chatItemDiv.classList.add('active');
 
         const titleSpan = document.createElement('span');
@@ -688,7 +742,16 @@ newChatBtn.addEventListener('click', createNewChat);
 
 sendBtn.addEventListener('click', handleSend);
 userInput.addEventListener('keydown', (e) => {
+    if (userInput.classList.contains('input-error')) {
+        userInput.classList.remove('input-error');
+    }
     if (e.key === 'Enter' && !userInput.disabled) handleSend();
+});
+
+userInput.addEventListener('input', () => {
+    if (userInput.classList.contains('input-error')) {
+        userInput.classList.remove('input-error');
+    }
 });
 
 chatContainer.addEventListener('click', (e) => {
@@ -702,8 +765,12 @@ chatContainer.addEventListener('click', (e) => {
 
 function handleSend() {
     const text = userInput.value.trim();
-    if (text === '') return;
+    if (text === '') {
+        userInput.classList.add('input-error');
+        return;
+    }
 
+    userInput.classList.remove('input-error');
     userInput.value = '';
     processUserMessage(text);
 }
