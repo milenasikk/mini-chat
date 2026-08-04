@@ -1003,7 +1003,7 @@ function renameChat(chatId) {
     if (!currentItem) return;
 
     const titleSpan = currentItem.querySelector('.chat-title-text');
-    const actionsDiv = currentItem.querySelector('.chat-actions');
+    const dropdownDiv = currentItem.querySelector('.chat-dropdown');
 
     if (!titleSpan) return;
 
@@ -1023,7 +1023,7 @@ function renameChat(chatId) {
     `;
 
     titleSpan.replaceWith(editInput);
-    if (actionsDiv) actionsDiv.style.display = 'none';
+    if (dropdownDiv) dropdownDiv.style.display = 'none';
     editInput.focus();
 
     const saveRename = () => {
@@ -1095,49 +1095,75 @@ function createChatItemElement(chat) {
     titleSpan.classList.add('chat-title-text');
     titleSpan.innerText = chat.title;
 
-    const actionsDiv = document.createElement('div');
-    actionsDiv.classList.add('chat-actions');
+    // Dropdown menu container
+    const dropdownDiv = document.createElement('div');
+    dropdownDiv.classList.add('chat-dropdown');
 
-    const pinBtn = document.createElement('button');
-    pinBtn.classList.add('action-btn', 'pin-btn');
-    if (chat.pinned) pinBtn.classList.add('active');
-    pinBtn.innerHTML = chat.pinned ? '★' : '☆';
-    pinBtn.title = chat.pinned ? 'Unpin chat' : 'Pin chat';
+    // Three-dot trigger button (⋮)
+    const triggerBtn = document.createElement('button');
+    triggerBtn.classList.add('dropdown-trigger');
+    triggerBtn.innerHTML = '⋮';
+    triggerBtn.title = 'Options';
 
-    pinBtn.addEventListener('click', (e) => {
+    const menuUl = document.createElement('ul');
+    menuUl.classList.add('dropdown-menu');
+
+    // Option 1: Favorite / Unpin
+    const pinLi = document.createElement('li');
+    pinLi.classList.add('dropdown-item');
+    pinLi.innerText = chat.pinned ? '★ Unpin' : '☆ Add to Favorites';
+    pinLi.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleChatPin(chat.id);
     });
 
-    const duplicateBtn = document.createElement('button');
-    duplicateBtn.classList.add('action-btn', 'duplicate-btn');
-    duplicateBtn.innerHTML = '⧉';
-    duplicateBtn.title = 'Duplicate chat';
-
-    duplicateBtn.addEventListener('click', (e) => {
+    // Option 2: Duplicate
+    const duplicateLi = document.createElement('li');
+    duplicateLi.classList.add('dropdown-item');
+    duplicateLi.innerText = '⧉ Duplicate';
+    duplicateLi.addEventListener('click', (e) => {
         e.stopPropagation();
         duplicateChat(chat.id);
     });
 
-    const editBtn = document.createElement('button');
-    editBtn.classList.add('action-btn', 'edit-btn');
-    editBtn.innerHTML = '✏️';
-    editBtn.title = 'Rename chat';
-
-    editBtn.addEventListener('click', (e) => {
+    // Option 3: Rename
+    const editLi = document.createElement('li');
+    editLi.classList.add('dropdown-item');
+    editLi.innerText = '✏ Rename';
+    editLi.addEventListener('click', (e) => {
         e.stopPropagation();
         renameChat(chat.id);
     });
 
-    const deleteBtn = document.createElement('button');
-    deleteBtn.classList.add('action-btn', 'delete-btn');
-    deleteBtn.innerHTML = '✖';
-    deleteBtn.title = 'Delete chat';
-
-    deleteBtn.addEventListener('click', (e) => {
+    // Option 4: Delete
+    const deleteLi = document.createElement('li');
+    deleteLi.classList.add('dropdown-item', 'delete-item');
+    deleteLi.innerText = '✖ Delete';
+    deleteLi.addEventListener('click', (e) => {
         e.stopPropagation();
         deleteChat(chat.id);
     });
+
+    menuUl.appendChild(pinLi);
+    menuUl.appendChild(duplicateLi);
+    menuUl.appendChild(editLi);
+    menuUl.appendChild(deleteLi);
+
+    // Open/close the menu when the three-dot button is clicked
+    triggerBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.dropdown-menu.open').forEach(menu => {
+            if (menu !== menuUl) {
+                menu.classList.remove('open');
+                menu.closest('.chat-item')?.classList.remove('menu-open');
+            }
+        });
+        menuUl.classList.toggle('open');
+        chatItemDiv.classList.toggle('menu-open', menuUl.classList.contains('open'));
+    });
+
+    dropdownDiv.appendChild(triggerBtn);
+    dropdownDiv.appendChild(menuUl);
 
     chatItemDiv.addEventListener('click', () => {
         if (activeChatId === chat.id) return;
@@ -1147,16 +1173,19 @@ function createChatItemElement(chat) {
         loadActiveChat();
     });
 
-    actionsDiv.appendChild(pinBtn);
-    actionsDiv.appendChild(duplicateBtn);
-    actionsDiv.appendChild(editBtn);
-    actionsDiv.appendChild(deleteBtn);
-
     chatItemDiv.appendChild(titleSpan);
-    chatItemDiv.appendChild(actionsDiv);
+    chatItemDiv.appendChild(dropdownDiv);
     li.appendChild(chatItemDiv);
     return li;
 }
+
+// Automatically close the dropdown menu when clicking anywhere else
+document.addEventListener('click', () => {
+    document.querySelectorAll('.dropdown-menu.open').forEach(menu => {
+        menu.classList.remove('open');
+        menu.closest('.chat-item')?.classList.remove('menu-open');
+    });
+});
 
 function movePinnedChat(draggedId, targetId) {
     const draggedIndex = chats.findIndex(c => c.id === draggedId);
