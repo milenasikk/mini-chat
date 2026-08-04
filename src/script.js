@@ -568,6 +568,12 @@ const confirmMessage = document.getElementById('confirm-message');
 const confirmOkBtn = document.getElementById('confirm-ok-btn');
 const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
 
+const snackbar = document.getElementById('snackbar');
+const snackbarMessage = document.getElementById('snackbar-message');
+const snackbarUndoBtn = document.getElementById('snackbar-undo-btn');
+const customAccentSwatch = document.getElementById('custom-accent-swatch');
+const customAccentInput = document.getElementById('custom-accent-input');
+
 const style = document.createElement('style');
 style.innerHTML = `
     .text-input.input-error::placeholder {
@@ -592,6 +598,7 @@ const defaultSettings = {
     effectsEnabled: true,
     theme: 'light',
     accentColor: 'red',
+    customColor: '#8a3a3a',
     fontSize: 'medium'
 };
 
@@ -604,6 +611,35 @@ const accentPalette = {
     purple: { main: 'rgb(66, 25, 90)', light: 'rgba(66, 25, 90, 0.1)' },
     yellow: { main: 'rgb(180, 130, 20)', light: 'rgba(180, 130, 20, 0.1)' }
 };
+
+// Converts a "#rrggbb" hex string into { r, g, b } components
+function hexToRgb(hex) {
+    const clean = hex.replace('#', '');
+    const bigint = parseInt(clean, 16);
+    return {
+        r: (bigint >> 16) & 255,
+        g: (bigint >> 8) & 255,
+        b: bigint & 255
+    };
+}
+
+// Relative luminance, used to decide whether light or dark text reads best on the accent color
+function getLuminance({ r, g, b }) {
+    const [rs, gs, bs] = [r, g, b].map(c => {
+        const channel = c / 255;
+        return channel <= 0.03928 ? channel / 12.92 : Math.pow((channel + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+function getCustomPalette(hex) {
+    const { r, g, b } = hexToRgb(hex);
+    return {
+        main: `rgb(${r}, ${g}, ${b})`,
+        light: `rgba(${r}, ${g}, ${b}, 0.1)`,
+        textOn: getLuminance({ r, g, b }) > 0.4 ? 'rgb(40, 30, 30)' : 'rgb(247, 247, 255)'
+    };
+}
 
 const fontSizeMap = {
     small: '14px',
@@ -622,9 +658,13 @@ function applySettings() {
     document.body.classList.toggle('effects-disabled', !settings.effectsEnabled);
     document.body.classList.toggle('theme-dark', settings.theme === 'dark');
 
-    const palette = accentPalette[settings.accentColor] || accentPalette.red;
+    const palette = settings.accentColor === 'custom'
+        ? getCustomPalette(settings.customColor)
+        : (accentPalette[settings.accentColor] || accentPalette.red);
+
     document.documentElement.style.setProperty('--main-red', palette.main);
     document.documentElement.style.setProperty('--accent-light', palette.light);
+    document.documentElement.style.setProperty('--text-on-red', palette.textOn || 'rgb(247, 247, 255)');
 
     document.documentElement.style.setProperty('--chat-font-size', fontSizeMap[settings.fontSize] || fontSizeMap.medium);
 
@@ -635,6 +675,15 @@ function applySettings() {
         accentSwatches.querySelectorAll('.accent-swatch').forEach(btn => {
             btn.classList.toggle('active', btn.getAttribute('data-accent') === settings.accentColor);
         });
+    }
+
+    if (customAccentSwatch) {
+        customAccentSwatch.style.setProperty('--swatch-color', settings.customColor);
+        customAccentSwatch.classList.toggle('active', settings.accentColor === 'custom');
+    }
+
+    if (customAccentInput) {
+        customAccentInput.value = settings.customColor;
     }
 
     if (fontSizeSwitch) {
@@ -691,6 +740,19 @@ function initSettings() {
             const btn = e.target.closest('.accent-swatch');
             if (!btn) return;
             settings.accentColor = btn.getAttribute('data-accent');
+            saveSettingsToLocalStorage();
+            applySettings();
+        });
+    }
+
+    if (customAccentSwatch && customAccentInput) {
+        customAccentSwatch.addEventListener('click', () => {
+            customAccentInput.click();
+        });
+
+        customAccentInput.addEventListener('input', () => {
+            settings.accentColor = 'custom';
+            settings.customColor = customAccentInput.value;
             saveSettingsToLocalStorage();
             applySettings();
         });
@@ -979,20 +1041,79 @@ function getDateBucketLabel(timestamp) {
     return 'Older';
 }
 
+let snackbarTimeoutId = null;
+let snackbarUndoHandler = null;
+
+function showUndoSnackbar(message, onUndo) {
+    if (!snackbar || !snackbarMessage) return;
+
+    if (snackbarTimeoutId) {
+        clearTimeout(snackbarTimeoutId);
+    }
+
+    snackbarMessage.innerText = message;
+    snackbarUndoHandler = onUndo;
+    snackbar.classList.remove('show');
+    // Force reflow so the show animation restarts if a snackbar was already visible
+    void snackbar.offsetWidth;
+    snackbar.classList.add('show');
+
+    snackbarTimeoutId = setTimeout(hideSnackbar, 5000);
+}
+
+function hideSnackbar() {
+    if (snackbarTimeoutId) {
+        clearTimeout(snackbarTimeoutId);
+        snackbarTimeoutId = null;
+    }
+    if (snackbar) snackbar.classList.remove('show');
+    snackbarUndoHandler = null;
+}
+
+if (snackbarUndoBtn) {
+    snackbarUndoBtn.addEventListener('click', () => {
+        if (snackbarUndoHandler) snackbarUndoHandler();
+        hideSnackbar();
+    });
+}
+
 function deleteChat(chatId) {
-    chats = chats.filter(c => c.id !== chatId);
-    
+    const index = chats.findIndex(c => c.id === chatId);
+    if (index === -1) return;
+
+    const [removedChat] = chats.splice(index, 1);
+    const wasActive = activeChatId === chatId;
+    let autoCreatedChatId = null;
+
     if (chats.length === 0) {
         saveToLocalStorage();
         createNewChat();
+        autoCreatedChatId = activeChatId;
     } else {
-        if (activeChatId === chatId) {
+        if (wasActive) {
             activeChatId = chats[0].id;
         }
         saveToLocalStorage();
         renderSidebar();
         loadActiveChat();
     }
+
+    showUndoSnackbar('Chat deleted', () => {
+        undoDeleteChat(removedChat, index, autoCreatedChatId);
+    });
+}
+
+function undoDeleteChat(removedChat, index, autoCreatedChatId) {
+    if (autoCreatedChatId !== null) {
+        chats = chats.filter(c => c.id !== autoCreatedChatId);
+    }
+
+    const insertAt = Math.min(index, chats.length);
+    chats.splice(insertAt, 0, removedChat);
+    activeChatId = removedChat.id;
+    saveToLocalStorage();
+    renderSidebar();
+    loadActiveChat();
 }
 
 function renameChat(chatId) {
